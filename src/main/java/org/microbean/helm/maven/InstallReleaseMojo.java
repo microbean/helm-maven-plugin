@@ -29,6 +29,8 @@ import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
+import java.util.regex.Matcher;
+
 import javax.inject.Inject;
 
 import hapi.chart.ChartOuterClass.Chart;
@@ -55,7 +57,7 @@ import org.microbean.helm.chart.AbstractChartLoader;
 import org.microbean.helm.chart.URLChartLoader;
 
 @Mojo(name = "install")
-public class InstallReleaseMojo extends AbstractSingleReleaseMojo {
+public class InstallReleaseMojo extends AbstractReleaseMojo {
 
   private final MavenProject project;
 
@@ -67,6 +69,9 @@ public class InstallReleaseMojo extends AbstractSingleReleaseMojo {
   @Parameter
   private boolean dryRun;
 
+  @Parameter
+  private String releaseName;
+  
   @Parameter
   private String releaseNamespace;
 
@@ -210,6 +215,15 @@ public class InstallReleaseMojo extends AbstractSingleReleaseMojo {
     this.dryRun = dryRun;
   }
 
+  public String getReleaseName() {
+    return this.releaseName;
+  }
+  
+  public void setReleaseName(final String releaseName) {
+    this.validateReleaseName(releaseName);
+    this.releaseName = releaseName;
+  }
+  
   public String getReleaseNamespace() {
     return this.releaseNamespace;
   }
@@ -250,4 +264,14 @@ public class InstallReleaseMojo extends AbstractSingleReleaseMojo {
     this.wait = wait;
   }
 
+  protected void validateReleaseName(final String name) {
+    if (name != null && !name.isEmpty()) {
+      final Matcher matcher = ReleaseManager.DNS_SUBDOMAIN_PATTERN.matcher(name);
+      assert matcher != null;
+      if (!matcher.matches()) {
+        throw new IllegalArgumentException("Invalid release name: " + name + "; must match " + ReleaseManager.DNS_SUBDOMAIN_PATTERN.toString());
+      }
+    }
+  }
+  
 }

@@ -24,7 +24,7 @@ import org.microbean.helm.ReleaseManager;
 
 public abstract class AbstractSingleReleaseMojo extends AbstractReleaseMojo {
 
-  @Parameter
+  @Parameter(required = true)
   private String releaseName;
   
   protected AbstractSingleReleaseMojo() {
@@ -41,7 +41,11 @@ public abstract class AbstractSingleReleaseMojo extends AbstractReleaseMojo {
   }
   
   protected void validateReleaseName(final String name) {
-    if (name != null && !name.isEmpty()) {
+    if (name == null) {
+      throw new IllegalArgumentException("Invalid release name: null");
+    } else if (name.isEmpty()) {
+      throw new IllegalArgumentException("Invalid release name: ");
+    } else {
       final Matcher matcher = ReleaseManager.DNS_SUBDOMAIN_PATTERN.matcher(name);
       assert matcher != null;
       if (!matcher.matches()) {
