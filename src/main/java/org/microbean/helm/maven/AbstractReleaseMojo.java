@@ -68,7 +68,7 @@ public abstract class AbstractReleaseMojo extends AbstractHelmMojo {
 
   
   @Override
-  public final void execute() throws MojoExecutionException, MojoFailureException {
+  public void execute() throws MojoExecutionException, MojoFailureException {
     final Log log = this.getLog();
     assert log != null;
 

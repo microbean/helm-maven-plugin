@@ -16,6 +16,8 @@
  */
 package org.microbean.helm.maven;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
@@ -30,6 +32,7 @@ import hapi.services.tiller.Tiller.ListReleasesRequest;
 import hapi.services.tiller.Tiller.ListReleasesResponse;
 import hapi.services.tiller.Tiller.ListSort.SortBy;
 import hapi.services.tiller.Tiller.ListSort.SortOrder;
+
 import org.apache.maven.plugin.logging.Log;
 
 import org.apache.maven.plugins.annotations.Mojo;
@@ -61,6 +64,9 @@ public class ListReleasesMojo extends AbstractReleaseMojo {
   @Parameter
   private List<Status.Code> statusCodes;
 
+  @Parameter(alias = "releaseDiscoveryListenersList")
+  private List<ReleaseDiscoveryListener> releaseDiscoveryListeners;
+  
 
   /*
    * Constructors.
@@ -82,6 +88,14 @@ public class ListReleasesMojo extends AbstractReleaseMojo {
     Objects.requireNonNull(releaseManagerCallable);
     final Log log = this.getLog();
     assert log != null;
+
+    final Collection<? extends ReleaseDiscoveryListener> listeners = this.getReleaseDiscoveryListenersList();
+    if (listeners == null || listeners.isEmpty()) {
+      if (log.isInfoEnabled()) {
+        log.info("Skipping execution because there are no ReleaseDiscoveryListeners specified.");
+      }
+      return;
+    }
 
     final ListReleasesRequest.Builder requestBuilder = ListReleasesRequest.newBuilder();
     assert requestBuilder != null;
@@ -136,14 +150,16 @@ public class ListReleasesMojo extends AbstractReleaseMojo {
     if (log.isInfoEnabled()) {
       log.info("Listing releases in namespace " + namespace);
     }
+    
     final Iterator<? extends ListReleasesResponse> listReleasesResponseIterator = releaseManager.list(requestBuilder.build());
     assert listReleasesResponseIterator != null;
-    if (listReleasesResponseIterator.hasNext()) {
-      if (log.isInfoEnabled()) {
-        while (listReleasesResponseIterator.hasNext()) {
-          final ListReleasesResponse response = listReleasesResponseIterator.next();
-          assert response != null;
-          log.info(response.toString());
+    while (listReleasesResponseIterator.hasNext()) {
+      final ListReleasesResponse response = listReleasesResponseIterator.next();
+      assert response != null;
+      final ReleaseDiscoveryEvent event = new ReleaseDiscoveryEvent(this, log, response);
+      for (final ReleaseDiscoveryListener listener : listeners) {
+        if (listener != null) {
+          listener.releaseDiscovered(event);
         }
       }
     }
@@ -211,6 +227,38 @@ public class ListReleasesMojo extends AbstractReleaseMojo {
 
   public void setStatusCodes(final List<Status.Code> statusCodes) {
     this.statusCodes = statusCodes;
+  }
+
+  public void addReleaseDiscoveryListener(final ReleaseDiscoveryListener listener) {
+    if (listener != null) {
+      if (this.releaseDiscoveryListeners == null) {
+        this.releaseDiscoveryListeners = new ArrayList<>();      
+      }
+      this.releaseDiscoveryListeners.add(listener);
+    }
+  }
+
+  public void removeReleaseDiscoveryListener(final ReleaseDiscoveryListener listener) {
+    if (listener != null && this.releaseDiscoveryListeners != null) {
+      this.releaseDiscoveryListeners.remove(listener);
+    }
+  }
+  
+  public ReleaseDiscoveryListener[] getReleaseDiscoveryListeners() {
+    final Collection<ReleaseDiscoveryListener> listeners = this.getReleaseDiscoveryListenersList();
+    if (listeners == null || listeners.isEmpty()) {
+      return new ReleaseDiscoveryListener[0];
+    } else {
+      return listeners.toArray(new ReleaseDiscoveryListener[listeners.size()]);
+    }
+  }
+
+  public List<ReleaseDiscoveryListener> getReleaseDiscoveryListenersList() {
+    return this.releaseDiscoveryListeners;
+  }
+
+  public void setReleaseDiscoveryListenersList(final List<ReleaseDiscoveryListener> releaseDiscoveryListeners) {
+    this.releaseDiscoveryListeners = releaseDiscoveryListeners;
   }
 
 }
