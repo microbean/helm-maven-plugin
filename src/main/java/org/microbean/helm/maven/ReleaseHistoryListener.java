@@ -17,27 +17,9 @@
 package org.microbean.helm.maven;
 
 import java.util.EventListener;
-import java.util.Objects;
 
-import hapi.services.tiller.Tiller.ListReleasesResponseOrBuilder;
+public interface ReleaseHistoryListener extends EventListener {
 
-import org.apache.maven.plugin.logging.Log;
-
-public class AbstractReleaseDiscoveryListener implements ReleaseDiscoveryListener {
-
-  public AbstractReleaseDiscoveryListener() {
-    super();
-  }
-
-  @Override
-  public void releaseDiscovered(final ReleaseDiscoveryEvent event) {
-    if (event != null) {
-      final ListReleasesResponseOrBuilder listReleasesResponseOrBuilder = event.getListReleasesResponseOrBuilder();
-      final Log log = event.getLog();
-      if (log != null && log.isInfoEnabled()) {
-        log.info(String.valueOf(listReleasesResponseOrBuilder));
-      }
-    }
-  }
+  public void releaseHistoryRetrieved(final ReleaseHistoryEvent event);
   
 }

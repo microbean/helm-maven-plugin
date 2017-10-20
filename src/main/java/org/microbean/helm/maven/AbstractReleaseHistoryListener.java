@@ -19,23 +19,23 @@ package org.microbean.helm.maven;
 import java.util.EventListener;
 import java.util.Objects;
 
-import hapi.services.tiller.Tiller.ListReleasesResponseOrBuilder;
+import hapi.services.tiller.Tiller.GetHistoryResponseOrBuilder;
 
 import org.apache.maven.plugin.logging.Log;
 
-public class AbstractReleaseDiscoveryListener implements ReleaseDiscoveryListener {
+public class AbstractReleaseHistoryListener implements ReleaseHistoryListener {
 
-  public AbstractReleaseDiscoveryListener() {
+  public AbstractReleaseHistoryListener() {
     super();
   }
 
   @Override
-  public void releaseDiscovered(final ReleaseDiscoveryEvent event) {
+  public void releaseHistoryRetrieved(final ReleaseHistoryEvent event) {
     if (event != null) {
-      final ListReleasesResponseOrBuilder listReleasesResponseOrBuilder = event.getListReleasesResponseOrBuilder();
+      final GetHistoryResponseOrBuilder getHistoryResponseOrBuilder = event.getHistoryResponseOrBuilder();
       final Log log = event.getLog();
       if (log != null && log.isInfoEnabled()) {
-        log.info(String.valueOf(listReleasesResponseOrBuilder));
+        log.info(String.valueOf(getHistoryResponseOrBuilder));
       }
     }
   }
