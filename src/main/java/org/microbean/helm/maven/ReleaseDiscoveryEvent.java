@@ -23,27 +23,20 @@ import hapi.services.tiller.Tiller.ListReleasesResponseOrBuilder;
 
 import org.apache.maven.plugin.logging.Log;
 
-public class ReleaseDiscoveryEvent extends EventObject {
+public class ReleaseDiscoveryEvent extends AbstractReleaseEvent {
 
   private static final long serialVersionUID = 1L;
   
   private final ListReleasesResponseOrBuilder listReleasesResponseOrBuilder;
-
-  private final Log log;
   
   public ReleaseDiscoveryEvent(final ListReleasesMojo source, final Log log, final ListReleasesResponseOrBuilder listReleasesResponseOrBuilder) {
-    super(source);
+    super(source, log);
     Objects.requireNonNull(listReleasesResponseOrBuilder);
     this.listReleasesResponseOrBuilder = listReleasesResponseOrBuilder;
-    this.log = log;
   }
 
   public final ListReleasesResponseOrBuilder getListReleasesResponseOrBuilder() {
     return this.listReleasesResponseOrBuilder;
-  }
-
-  public final Log getLog() {
-    return this.log;
   }
 
   @Override

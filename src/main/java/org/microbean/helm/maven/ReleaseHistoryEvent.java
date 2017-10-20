@@ -23,27 +23,20 @@ import hapi.services.tiller.Tiller.GetHistoryResponseOrBuilder;
 
 import org.apache.maven.plugin.logging.Log;
 
-public class ReleaseHistoryEvent extends EventObject {
+public class ReleaseHistoryEvent extends AbstractReleaseEvent {
 
   private static final long serialVersionUID = 1L;
   
   private final GetHistoryResponseOrBuilder getHistoryResponseOrBuilder;
-
-  private final Log log;
   
   public ReleaseHistoryEvent(final GetHistoryMojo source, final Log log, final GetHistoryResponseOrBuilder getHistoryResponseOrBuilder) {
-    super(source);
+    super(source, log);
     Objects.requireNonNull(getHistoryResponseOrBuilder);
     this.getHistoryResponseOrBuilder = getHistoryResponseOrBuilder;
-    this.log = log;
   }
 
   public final GetHistoryResponseOrBuilder getHistoryResponseOrBuilder() {
     return this.getHistoryResponseOrBuilder;
-  }
-
-  public final Log getLog() {
-    return this.log;
   }
 
   @Override

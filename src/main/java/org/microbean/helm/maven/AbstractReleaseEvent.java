@@ -19,29 +19,26 @@ package org.microbean.helm.maven;
 import java.util.EventObject;
 import java.util.Objects;
 
-import hapi.services.tiller.Tiller.GetReleaseContentResponseOrBuilder;
-
 import org.apache.maven.plugin.logging.Log;
 
-public class ReleaseContentEvent extends AbstractReleaseEvent {
+public abstract class AbstractReleaseEvent extends EventObject {
 
   private static final long serialVersionUID = 1L;
   
-  private final GetReleaseContentResponseOrBuilder getReleaseContentResponseOrBuilder;
+  private final Log log;
   
-  public ReleaseContentEvent(final GetReleaseContentMojo source, final Log log, final GetReleaseContentResponseOrBuilder getReleaseContentResponseOrBuilder) {
-    super(source, log);
-    Objects.requireNonNull(getReleaseContentResponseOrBuilder);
-    this.getReleaseContentResponseOrBuilder = getReleaseContentResponseOrBuilder;
+  protected AbstractReleaseEvent(final AbstractReleaseMojo source, final Log log) {
+    super(source);
+    this.log = log;
   }
 
-  public final GetReleaseContentResponseOrBuilder getReleaseContentResponseOrBuilder() {
-    return this.getReleaseContentResponseOrBuilder;
+  public final Log getLog() {
+    return this.log;
   }
 
   @Override
-  public final GetReleaseContentMojo getSource() {
-    return (GetReleaseContentMojo)super.getSource();
+  public AbstractReleaseMojo getSource() {
+    return (AbstractReleaseMojo)super.getSource();
   }
   
 }

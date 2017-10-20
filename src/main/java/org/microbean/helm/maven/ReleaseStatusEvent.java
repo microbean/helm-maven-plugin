@@ -23,27 +23,20 @@ import hapi.services.tiller.Tiller.GetReleaseStatusResponseOrBuilder;
 
 import org.apache.maven.plugin.logging.Log;
 
-public class ReleaseStatusEvent extends EventObject {
+public class ReleaseStatusEvent extends AbstractReleaseEvent {
 
   private static final long serialVersionUID = 1L;
   
   private final GetReleaseStatusResponseOrBuilder getReleaseStatusResponseOrBuilder;
 
-  private final Log log;
-  
   public ReleaseStatusEvent(final GetReleaseStatusMojo source, final Log log, final GetReleaseStatusResponseOrBuilder getReleaseStatusResponseOrBuilder) {
-    super(source);
+    super(source, log);
     Objects.requireNonNull(getReleaseStatusResponseOrBuilder);
     this.getReleaseStatusResponseOrBuilder = getReleaseStatusResponseOrBuilder;
-    this.log = log;
   }
 
   public final GetReleaseStatusResponseOrBuilder getReleaseStatusResponseOrBuilder() {
     return this.getReleaseStatusResponseOrBuilder;
-  }
-
-  public final Log getLog() {
-    return this.log;
   }
 
   @Override
