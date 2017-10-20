@@ -19,27 +19,25 @@ package org.microbean.helm.maven;
 import java.util.EventObject;
 import java.util.Objects;
 
-import hapi.services.tiller.Tiller.GetHistoryResponseOrBuilder;
+import hapi.services.tiller.Tiller.GetReleaseStatusResponseOrBuilder;
 
 import org.apache.maven.plugin.logging.Log;
 
-public class ReleaseHistoryEvent extends EventObject {
+public class ReleaseStatusEvent extends EventObject {
 
-  private static final long serialVersionUID = 1L;
-  
-  private final GetHistoryResponseOrBuilder getHistoryResponseOrBuilder;
+  private final GetReleaseStatusResponseOrBuilder getReleaseStatusResponseOrBuilder;
 
   private final Log log;
   
-  public ReleaseHistoryEvent(final GetHistoryMojo source, final Log log, final GetHistoryResponseOrBuilder getHistoryResponseOrBuilder) {
+  public ReleaseStatusEvent(final GetReleaseStatusMojo source, final Log log, final GetReleaseStatusResponseOrBuilder getReleaseStatusResponseOrBuilder) {
     super(source);
-    Objects.requireNonNull(getHistoryResponseOrBuilder);
-    this.getHistoryResponseOrBuilder = getHistoryResponseOrBuilder;
+    Objects.requireNonNull(getReleaseStatusResponseOrBuilder);
+    this.getReleaseStatusResponseOrBuilder = getReleaseStatusResponseOrBuilder;
     this.log = log;
   }
 
-  public final GetHistoryResponseOrBuilder getHistoryResponseOrBuilder() {
-    return this.getHistoryResponseOrBuilder;
+  public final GetReleaseStatusResponseOrBuilder getReleaseStatusResponseOrBuilder() {
+    return this.getReleaseStatusResponseOrBuilder;
   }
 
   public final Log getLog() {
@@ -47,8 +45,8 @@ public class ReleaseHistoryEvent extends EventObject {
   }
 
   @Override
-  public final GetHistoryMojo getSource() {
-    return (GetHistoryMojo)super.getSource();
+  public final GetReleaseStatusMojo getSource() {
+    return (GetReleaseStatusMojo)super.getSource();
   }
   
 }
