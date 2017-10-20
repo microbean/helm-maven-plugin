@@ -29,16 +29,14 @@ import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
-import java.util.regex.Matcher;
-
 import javax.inject.Inject;
 
 import hapi.chart.ChartOuterClass.Chart;
 
 import hapi.release.ReleaseOuterClass.Release;
 
-import hapi.services.tiller.Tiller.InstallReleaseRequest;
-import hapi.services.tiller.Tiller.InstallReleaseResponse;
+import hapi.services.tiller.Tiller.UpdateReleaseRequest;
+import hapi.services.tiller.Tiller.UpdateReleaseResponse;
 
 import org.apache.maven.execution.MavenSession;
 
@@ -56,40 +54,39 @@ import org.microbean.helm.ReleaseManager;
 import org.microbean.helm.chart.AbstractChartLoader;
 import org.microbean.helm.chart.URLChartLoader;
 
-@Mojo(name = "install")
-public class InstallReleaseMojo extends AbstractMutatingReleaseMojo {
+@Mojo(name = "update")
+public class UpdateReleaseMojo extends AbstractForceableMutatingReleaseMojo {
 
-  private final MavenProject project;
 
-  private final MavenSession session;
-
-  /**
-   * The name of the release to install.  If omitted, a release name
-   * will be generated and used instead.
-   *
-   * @see #getReleaseName()
-   *
-   * @see #setReleaseName(String)
-   *
-   * @see #validateReleaseName(String)
+  /*
+   * Instance fields.
    */
-  @Parameter
-  private String releaseName;
+
   
-  @Parameter
-  private String releaseNamespace;
-
-  @Parameter
-  private boolean reuseReleaseName;
-
-  @Parameter
-  private String valuesYaml;
+  private final MavenProject project;
+  
+  private final MavenSession session;
 
   @Parameter
   private URL chartUrl;
+
+  @Parameter
+  private boolean resetValues;
+
+  @Parameter
+  private boolean reuseValues;
   
+  @Parameter
+  private String valuesYaml;
+  
+  
+  /*
+   * Constructors.
+   */
+  
+
   @Inject
-  public InstallReleaseMojo(final MavenProject project, final MavenSession session) {
+  public UpdateReleaseMojo(final MavenProject project, final MavenSession session) {
     super();
     Objects.requireNonNull(project);
     Objects.requireNonNull(session);
@@ -97,6 +94,12 @@ public class InstallReleaseMojo extends AbstractMutatingReleaseMojo {
     this.session = session;
   }
 
+
+  /*
+   * Instance methods.
+   */
+
+  
   @Override
   protected void execute(final Callable<ReleaseManager> releaseManagerCallable) throws Exception {
     Objects.requireNonNull(releaseManagerCallable);
@@ -136,24 +139,22 @@ public class InstallReleaseMojo extends AbstractMutatingReleaseMojo {
     if (log.isInfoEnabled()) {
       log.info("Loaded Helm chart from " + chartUrl);
     }
-    
-    final InstallReleaseRequest.Builder requestBuilder = InstallReleaseRequest.newBuilder();
+
+    final UpdateReleaseRequest.Builder requestBuilder = UpdateReleaseRequest.newBuilder();
     assert requestBuilder != null;
 
     requestBuilder.setDisableHooks(this.getDisableHooks());
     requestBuilder.setDryRun(this.getDryRun());
+    requestBuilder.setForce(this.getForce());
+    requestBuilder.setRecreate(this.getRecreate());
 
     final String releaseName = this.getReleaseName();
     if (releaseName != null) {
       requestBuilder.setName(releaseName);
     }
 
-    final String releaseNamespace = this.getReleaseNamespace();
-    if (releaseNamespace != null) {
-      requestBuilder.setNamespace(releaseNamespace);
-    }
-    
-    requestBuilder.setReuseName(this.getReuseReleaseName());
+    requestBuilder.setResetValues(this.getResetValues());
+    requestBuilder.setReuseValues(this.getReuseValues());
     requestBuilder.setTimeout(this.getTimeout());
 
     final String valuesYaml = this.getValuesYaml();
@@ -162,7 +163,7 @@ public class InstallReleaseMojo extends AbstractMutatingReleaseMojo {
       assert values != null;
       values.setRaw(valuesYaml);
     }
-
+    
     requestBuilder.setWait(this.getWait());
 
     final ReleaseManager releaseManager = releaseManagerCallable.call();
@@ -171,22 +172,18 @@ public class InstallReleaseMojo extends AbstractMutatingReleaseMojo {
     }
 
     if (log.isInfoEnabled()) {
-      log.info("Installing release " + requestBuilder.getName());
+      log.info("Updating release " + requestBuilder.getName());
     }
-    final Future<InstallReleaseResponse> installReleaseResponseFuture = releaseManager.install(requestBuilder, chartBuilder);
-    assert installReleaseResponseFuture != null;
-    final InstallReleaseResponse installReleaseResponse = installReleaseResponseFuture.get();
-    assert installReleaseResponse != null;
+    final Future<UpdateReleaseResponse> updateReleaseResponseFuture = releaseManager.update(requestBuilder, chartBuilder);
+    assert updateReleaseResponseFuture != null;
+    final UpdateReleaseResponse updateReleaseResponse = updateReleaseResponseFuture.get();
+    assert updateReleaseResponse != null;
     if (log.isInfoEnabled()) {
-      final Release release = installReleaseResponse.getRelease();
+      final Release release = updateReleaseResponse.getRelease();
       assert release != null;
-      log.info("Installed release " + release.getName());
+      log.info("Updated release " + release.getName());
     }
     
-  }
-
-  protected AbstractChartLoader<URL> createChartLoader() {
-    return new URLChartLoader();
   }
 
   public URL getChartUrl() {
@@ -197,20 +194,20 @@ public class InstallReleaseMojo extends AbstractMutatingReleaseMojo {
     this.chartUrl = chartUrl;
   }
   
-  public String getReleaseNamespace() {
-    return this.releaseNamespace;
+  public boolean getResetValues() {
+    return this.resetValues;
   }
 
-  public void setReleaseNamespace(final String releaseNamespace) {
-    this.releaseNamespace = releaseNamespace;
+  public void setResetValues(final boolean resetValues) {
+    this.resetValues = resetValues;
+  }
+  
+  public boolean getReuseValues() {
+    return this.reuseValues;
   }
 
-  public boolean getReuseReleaseName() {
-    return this.reuseReleaseName;
-  }
-
-  public void setReuseReleaseName(final boolean reuseReleaseName) {
-    this.reuseReleaseName = reuseReleaseName;
+  public void setReuseValues(final boolean reuseValues) {
+    this.reuseValues = reuseValues;
   }
 
   public String getValuesYaml() {
@@ -221,11 +218,8 @@ public class InstallReleaseMojo extends AbstractMutatingReleaseMojo {
     this.valuesYaml = valuesYaml;
   }
 
-  @Override
-  protected void validateReleaseName(final String name) {
-    if (name != null && !name.isEmpty()) {
-      super.validateReleaseName(name);
-    }
+  protected AbstractChartLoader<URL> createChartLoader() {
+    return new URLChartLoader();
   }
- 
+
 }

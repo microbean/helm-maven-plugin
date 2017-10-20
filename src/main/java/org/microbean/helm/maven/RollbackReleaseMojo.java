@@ -23,8 +23,8 @@ import java.util.concurrent.Future;
 
 import hapi.release.ReleaseOuterClass.Release;
 
-import hapi.services.tiller.Tiller.UninstallReleaseRequest;
-import hapi.services.tiller.Tiller.UninstallReleaseResponse;
+import hapi.services.tiller.Tiller.RollbackReleaseRequest;
+import hapi.services.tiller.Tiller.RollbackReleaseResponse;
 
 import org.apache.maven.plugin.logging.Log;
 
@@ -33,40 +33,56 @@ import org.apache.maven.plugins.annotations.Parameter;
 
 import org.microbean.helm.ReleaseManager;
 
-@Mojo(name = "uninstall")
-public class UninstallReleaseMojo extends AbstractSingleReleaseMojo {
+@Mojo(name = "rollback")
+public class RollbackReleaseMojo extends AbstractForceableMutatingReleaseMojo {
 
-  @Parameter
-  private boolean disableHooks;
 
-  @Parameter(defaultValue = "300")
-  private long timeout; // in seconds
+  /*
+   * Instance fields.
+   */
 
-  @Parameter
-  private boolean purge;
   
-  public UninstallReleaseMojo() {
+  @Parameter
+  private int version;
+
+
+  /*
+   * Constructors.
+   */
+  
+
+  public RollbackReleaseMojo() {
     super();
   }
 
+
+  /*
+   * Instance methods.
+   */
+
+  
   @Override
   protected void execute(final Callable<ReleaseManager> releaseManagerCallable) throws Exception {
     Objects.requireNonNull(releaseManagerCallable);
     final Log log = this.getLog();
     assert log != null;
 
-    final UninstallReleaseRequest.Builder requestBuilder = UninstallReleaseRequest.newBuilder();
+    final RollbackReleaseRequest.Builder requestBuilder = RollbackReleaseRequest.newBuilder();
     assert requestBuilder != null;
 
     requestBuilder.setDisableHooks(this.getDisableHooks());
+    requestBuilder.setDryRun(this.getDryRun());
+    requestBuilder.setForce(this.getForce());
+    requestBuilder.setRecreate(this.getRecreate());
 
     final String releaseName = this.getReleaseName();
     if (releaseName != null) {
       requestBuilder.setName(releaseName);
     }
-
-    requestBuilder.setPurge(this.getPurge());
+    
     requestBuilder.setTimeout(this.getTimeout());
+    requestBuilder.setVersion(this.getVersion());
+    requestBuilder.setWait(this.getWait());
 
     final ReleaseManager releaseManager = releaseManagerCallable.call();
     if (releaseManager == null) {
@@ -74,42 +90,26 @@ public class UninstallReleaseMojo extends AbstractSingleReleaseMojo {
     }
 
     if (log.isInfoEnabled()) {
-      log.info("Uninstalling release " + requestBuilder.getName());
+      log.info("Rolling back release " + requestBuilder.getName());
     }
-    final Future<UninstallReleaseResponse> uninstallReleaseResponseFuture = releaseManager.uninstall(requestBuilder.build());
-    assert uninstallReleaseResponseFuture != null;
-    final UninstallReleaseResponse uninstallReleaseResponse = uninstallReleaseResponseFuture.get();
-    assert uninstallReleaseResponse != null;
+    final Future<RollbackReleaseResponse> rollbackReleaseResponseFuture = releaseManager.rollback(requestBuilder.build());
+    assert rollbackReleaseResponseFuture != null;
+    final RollbackReleaseResponse rollbackReleaseResponse = rollbackReleaseResponseFuture.get();
+    assert rollbackReleaseResponse != null;
     if (log.isInfoEnabled()) {
-      final Release release = uninstallReleaseResponse.getRelease();
+      final Release release = rollbackReleaseResponse.getRelease();
       assert release != null;
-      log.info("Uninstalled release " + release.getName());
+      log.info("Rolled back release " + release.getName());
     }
     
   }
 
-  public boolean getDisableHooks() {
-    return this.disableHooks;
+  public int getVersion() {
+    return this.version;
   }
 
-  public void setDisableHooks(final boolean disableHooks) {
-    this.disableHooks = disableHooks;
-  }
-
-  public boolean getPurge() {
-    return this.purge;
-  }
-
-  public void setPurge(final boolean purge) {
-    this.purge = purge;
-  }
-  
-  public long getTimeout() {
-    return this.timeout;
-  }
-
-  public void setTimeout(final long timeoutInSeconds) {
-    this.timeout = timeoutInSeconds;
+  public void setVersion(final int version) {
+    this.version = version;
   }
 
 }

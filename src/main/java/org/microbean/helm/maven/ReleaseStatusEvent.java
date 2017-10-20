@@ -25,6 +25,8 @@ import org.apache.maven.plugin.logging.Log;
 
 public class ReleaseStatusEvent extends EventObject {
 
+  private static final long serialVersionUID = 1L;
+  
   private final GetReleaseStatusResponseOrBuilder getReleaseStatusResponseOrBuilder;
 
   private final Log log;
