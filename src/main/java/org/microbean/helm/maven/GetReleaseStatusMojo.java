@@ -18,20 +18,14 @@ package org.microbean.helm.maven;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
-import hapi.release.ReleaseOuterClass.Release;
-import hapi.release.StatusOuterClass.Status;
-
 import hapi.services.tiller.Tiller.GetReleaseStatusRequest;
 import hapi.services.tiller.Tiller.GetReleaseStatusResponse;
-import hapi.services.tiller.Tiller.ListSort.SortBy;
-import hapi.services.tiller.Tiller.ListSort.SortOrder;
 
 import org.apache.maven.plugin.logging.Log;
 

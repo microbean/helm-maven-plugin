@@ -23,14 +23,11 @@ import java.util.List;
 import java.util.Objects;
 
 import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
 
 import hapi.release.TestRunOuterClass.TestRun;
 
 import hapi.services.tiller.Tiller.TestReleaseRequest;
 import hapi.services.tiller.Tiller.TestReleaseResponse;
-import hapi.services.tiller.Tiller.ListSort.SortBy;
-import hapi.services.tiller.Tiller.ListSort.SortOrder;
 
 import org.apache.maven.plugin.MojoFailureException;
 
