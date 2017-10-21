@@ -6,14 +6,18 @@
                         http://maven.apache.org/xsd/decoration-1.7.0.xsd"
     name="${project.name}"
     combine.self="merge">
-
+  <bannerRight>
+    <name>μb ${project.artifactId}</name>
+    <src>https://avatars0.githubusercontent.com/u/25515632?s=60</src>
+    <href>${project.url}</href>
+  </bannerRight>
   <version position="right"/>
   <skin>
     <groupId>org.apache.maven.skins</groupId>
     <artifactId>maven-fluido-skin</artifactId>
     <version>1.6</version>
   </skin>
-
+  
   <body>
     <links>
       <item name="microBean Helm" href="https://microbean.github.io/microbean-helm"/>
