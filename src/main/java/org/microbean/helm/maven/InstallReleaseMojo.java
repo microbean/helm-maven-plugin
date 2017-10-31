@@ -171,7 +171,7 @@ public class InstallReleaseMojo extends AbstractMutatingReleaseMojo {
    * href="https://docs.helm.sh/developing_charts/#charts">chart</a>
    * residing at the {@linkplain #getChartUrl() indicated URL} and
    * thus creates a <a
-   * href="https://docs.helm.sh/glossary/#release">release</a>.
+   * href="https://docs.helm.sh/glossary/#release">release</a>.</p>
    */
   @Override
   protected void execute(final Callable<ReleaseManager> releaseManagerCallable) throws Exception {
@@ -338,10 +338,29 @@ public class InstallReleaseMojo extends AbstractMutatingReleaseMojo {
     this.releaseNamespace = releaseNamespace;
   }
 
+  /**
+   * Returns {@code true} if the {@linkplain #getReleaseName()
+   * supplied release name} should be reused across installations.
+   *
+   * @return {@code true} if the {@linkplain #getReleaseName()
+   * supplied release name} should be reused across installations;
+   * {@code false} otherwise
+   *
+   * @see #setReuseReleaseName(boolean)
+   */
   public boolean getReuseReleaseName() {
     return this.reuseReleaseName;
   }
 
+  /**
+   * Sets whether the {@linkplain #getReleaseName() supplied release
+   * name} should be reused across installations.
+   *
+   * @param reuseReleaseName whether the {@linkplain #getReleaseName()
+   * supplied release name} should be reused across installations
+   *
+   * @see #getReuseReleaseName()
+   */
   public void setReuseReleaseName(final boolean reuseReleaseName) {
     this.reuseReleaseName = reuseReleaseName;
   }
