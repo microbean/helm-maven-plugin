@@ -18,8 +18,26 @@ package org.microbean.helm.maven;
 
 import org.apache.maven.plugin.AbstractMojo;
 
+/**
+ * An {@link AbstractMojo} serving as a base class for other <a
+ * href="https://microbean.github.io/microbean-helm/">Helm</a>-related
+ * <a
+ * href="https://maven.apache.org/developers/mojo-api-specification.html">mojo</a>s.
+ *
+ * @author <a href="https://about.me/lairdnelson"
+ * target="_parent">Laird Nelson</a>
+ */
 public abstract class AbstractHelmMojo extends AbstractMojo {
 
+
+  /*
+   * Constructors.
+   */
+
+
+  /**
+   * Creates a new {@link AbstractHelmMojo}.
+   */
   protected AbstractHelmMojo() {
     super();
   }

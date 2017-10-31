@@ -22,24 +22,90 @@ import org.apache.maven.plugins.annotations.Parameter;
 
 import org.microbean.helm.ReleaseManager;
 
+/**
+ * An {@link AbstractReleaseMojo} that works on exactly one <a
+ * href="https://docs.helm.sh/glossary/#release">Helm release</a>.
+ *
+ * @author <a href="https://about.me/lairdnelson"
+ * target="_parent">Laird Nelson</a>
+ */
 public abstract class AbstractSingleReleaseMojo extends AbstractReleaseMojo {
 
+
+  /*
+   * Instance fields.
+   */
+
+
+  /**
+   * The name of the release.
+   */
   @Parameter(required = true)
   private String releaseName;
+
+
+  /*
+   * Constructors.
+   */
   
+
+  /**
+   * Creates a new {@link AbstractSingleReleaseMojo}.
+   */
   protected AbstractSingleReleaseMojo() {
     super();
   }
 
+
+  /*
+   * Instance methods.
+   */
+  
+
+  /**
+   * Returns the release name.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * <p>Overrides of this method may return {@code null}.</p>
+   *
+   * @return the release name, or {@code null}
+   *
+   * @see #setReleaseName(String)
+   */
   public String getReleaseName() {
     return this.releaseName;
   }
 
+  /**
+   * Sets the release name.
+   *
+   * @param releaseName the name of the release; must not be {@code
+   * null} and must {@linkplain #validateReleaseName(String) pass
+   * validation}
+   *
+   * @see #getReleaseName()
+   */
   public void setReleaseName(final String releaseName) {
     validateReleaseName(releaseName);
     this.releaseName = releaseName;
   }
-  
+
+  /**
+   * Validates the supplied {@code name} as a <a
+   * href="https://docs.helm.sh/glossary/#release">Helm release</a>
+   * name.
+   *
+   * <p>This implementation checks to see if the supplied {@code name}
+   * is non-{@code null}, not {@linkplain String#isEmpty() empty}, and
+   * {@linkplain Matcher#matches() matches} the value of the {@link
+   * ReleaseManager#DNS_SUBDOMAIN_PATTERN} field.</p>
+   *
+   * @param name the release name to validate; must not be {@code
+   * null}
+   *
+   * @exception IllegalArgumentException if {@code name} is not valid
+   */
   protected void validateReleaseName(final String name) {
     if (name == null) {
       throw new IllegalArgumentException("Invalid release name: null");

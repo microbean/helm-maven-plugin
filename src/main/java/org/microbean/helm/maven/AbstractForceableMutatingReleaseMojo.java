@@ -22,30 +22,93 @@ import org.apache.maven.plugins.annotations.Parameter;
 
 import org.microbean.helm.ReleaseManager;
 
+/**
+ * An {@link AbstractMutatingReleaseMojo} that can be forced.
+ *
+ * @author <a href="https://about.me/lairdnelson"
+ * target="_parent">Laird Nelson</a>
+ */
 public abstract class AbstractForceableMutatingReleaseMojo extends AbstractMutatingReleaseMojo {
 
-  @Parameter
+
+  /*
+   * Instance fields.
+   */
+
+
+  /**
+   * Whether the operation should be forced.
+   */
+  @Parameter(defaultValue = "false")
   private boolean force;
 
-  @Parameter
+  /**
+   * Whether Pods should be recreated as part of the operation.
+   */
+  @Parameter(defaultValue = "false")
   private boolean recreate;
-  
+
+
+  /*
+   * Constructors.
+   */
+
+
+  /**
+   * Creates a new {@link AbstractForceableMutatingReleaseMojo}.
+   */
   protected AbstractForceableMutatingReleaseMojo() {
     super();
   }
 
+
+  /*
+   * Instance methods.
+   */
+
+
+  /**
+   * Returns whether the operation should be forced.
+   *
+   * @return whether the operation should be forced
+   *
+   * @see #setForce(boolean)
+   */
   public boolean getForce() {
     return this.force;
   }
-  
+
+  /**
+   * Sets whether the operation should be forced.
+   *
+   * @param force whether the operation should be forced
+   *
+   * @see #getForce()
+   */
   public void setForce(final boolean force) {
     this.force = force;
   }
 
+  /**
+   * Returns whether Pods should be recreated as part of the
+   * operation.
+   *
+   * @return whether Pods should be recreated as part of the operation
+   *
+   * @see #setRecreate(boolean)
+   */
   public boolean getRecreate() {
     return this.recreate;
   }
-  
+
+  /**
+   * Sets whether Pods should be recreated as part of the operation.
+   *
+   * @param recreate whether Pods should be recreated as part of the
+   * operation
+   *
+   * @see #getRecreate()
+   */
   public void setRecreate(final boolean recreate) {
     this.recreate = recreate;
   }
