@@ -56,11 +56,31 @@ import org.microbean.helm.ReleaseManager;
 import org.microbean.helm.chart.AbstractChartLoader;
 import org.microbean.helm.chart.URLChartLoader;
 
+/**
+ * <a
+ * href="https://github.com/kubernetes/helm/blob/master/docs/using_helm.md#helm-install-installing-a-package">Installs
+ * a chart and hence creates a release</a>.
+ *
+ * @author <a href="https://about.me/lairdnelson"
+ * target="_parent">Laird Nelson</a>
+ */
 @Mojo(name = "install")
 public class InstallReleaseMojo extends AbstractMutatingReleaseMojo {
 
+
+  /*
+   * Instance fields.
+   */
+
+
+  /**
+   * The {@link MavenProject} in effect.
+   */
   private final MavenProject project;
 
+  /**
+   * The {@link MavenSession} in effect.
+   */
   private final MavenSession session;
 
   /**
@@ -73,21 +93,60 @@ public class InstallReleaseMojo extends AbstractMutatingReleaseMojo {
    *
    * @see #validateReleaseName(String)
    */
+  /*
+   * This field shadows the AbstractSingleReleaseMojo#releaseName
+   * field on purpose to relax its "required" nature.
+   */
   @Parameter
   private String releaseName;
-  
+
+  /**
+   * The <a
+   * href="https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/">namespace</a>
+   * into which the release will be installed.
+   */
   @Parameter
   private String releaseNamespace;
 
-  @Parameter
+  /**
+   * Whether to reuse the release name for repeated installations.  It
+   * is strongly recommended that you not set this to {@code true} in
+   * production scenarios.
+   */
+  @Parameter(defaultValue = "false")
   private boolean reuseReleaseName;
 
+  /**
+   * YAML-formatted values to supply at the time of installation.
+   */
   @Parameter
   private String valuesYaml;
 
+  /**
+   * A {@link URL} representing the chart to install.  If omitted,
+   * <code>file:/${project.build.directory}/generated-sources/helm/charts/${project.artifactId}</code>
+   * will be used instead.
+   */
   @Parameter
   private URL chartUrl;
+
+  /*
+   * Constructors.
+   */
   
+
+  /**
+   * Creates a new {@link InstallReleaseMojo}.
+   *
+   * @param project the {@link MavenProject} in effect; must not be
+   * {@code null}
+   *
+   * @param session the {@link MavenSession} in effect; must not be
+   * {@code null}
+   *
+   * @exception NullPointerException if either {@code project} or
+   * {@code session} is {@code null}
+   */
   @Inject
   public InstallReleaseMojo(final MavenProject project, final MavenSession session) {
     super();
@@ -97,6 +156,23 @@ public class InstallReleaseMojo extends AbstractMutatingReleaseMojo {
     this.session = session;
   }
 
+
+  /*
+   * Instance methods.
+   */
+
+
+  /**
+   * {@inheritDoc}
+   *
+   * <p>This implementation <a
+   * href="https://github.com/kubernetes/helm/blob/master/docs/using_helm.md#helm-install-installing-a-package">installs</a>
+   * the <a
+   * href="https://docs.helm.sh/developing_charts/#charts">chart</a>
+   * residing at the {@linkplain #getChartUrl() indicated URL} and
+   * thus creates a <a
+   * href="https://docs.helm.sh/glossary/#release">release</a>.
+   */
   @Override
   protected void execute(final Callable<ReleaseManager> releaseManagerCallable) throws Exception {
     Objects.requireNonNull(releaseManagerCallable);
@@ -105,7 +181,7 @@ public class InstallReleaseMojo extends AbstractMutatingReleaseMojo {
 
     URL chartUrl = this.getChartUrl();
     if (chartUrl == null) {
-      final Path chartDirectoryPath = Paths.get(new StringBuilder(this.project.getBuild().getDirectory()).append("/helm/").append(this.project.getArtifactId()).toString());
+      final Path chartDirectoryPath = Paths.get(new StringBuilder(this.project.getBuild().getDirectory()).append("/generated-sources/helm/charts").append(this.project.getArtifactId()).toString());
       assert chartDirectoryPath != null;
       chartUrl = chartDirectoryPath.toUri().toURL();
       if (!Files.isDirectory(chartDirectoryPath)) {
@@ -185,22 +261,79 @@ public class InstallReleaseMojo extends AbstractMutatingReleaseMojo {
     
   }
 
+  /**
+   * Creates and returns an {@link AbstractChartLoader} capable of
+   * loading a Helm chart from a {@link URL}.
+   *
+   * <p>This method never returns {@code null}.</p>
+   *
+   * <p>Overrides of this method must not return {@code null}.</p>
+   *
+   * <p>This implementation returns a new {@link URLChartLoader}.</p>
+   *
+   * @return a new {@link AbstractChartLoader} implementation; never
+   * {@code null}
+   */
   protected AbstractChartLoader<URL> createChartLoader() {
     return new URLChartLoader();
   }
 
+  /**
+   * Returns a {@link URL} identifying a Helm chart that can be read
+   * by the {@link AbstractChartLoader} produced by the {@link
+   * #createChartLoader()} method.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * @return a {@link URL} to a Helm chart, or {@code null}
+   *
+   * @see #setChartUrl(URL)
+   */
   public URL getChartUrl() {
     return this.chartUrl;
   }
 
+  /**
+   * Sets the {@link URL} identifying a Helm chart that can be read
+   * by the {@link AbstractChartLoader} produced by the {@link
+   * #createChartLoader()} method.
+   *
+   * @param chartUrl the {@link URL} identifying a Helm chart that can
+   * be read by the {@link AbstractChartLoader} produced by the {@link
+   * #createChartLoader()} method; may be {@code null}
+   */
   public void setChartUrl(final URL chartUrl) {
     this.chartUrl = chartUrl;
   }
-  
+
+  /**
+   * Returns the <a
+   * href="https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/">namespace</a>
+   * into which the release will be installed.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * @return the <a
+   * href="https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/">namespace</a>
+   * into which the release will be installed, or {@code null}
+   *
+   * @see #setReleaseNamespace(String)
+   */
   public String getReleaseNamespace() {
     return this.releaseNamespace;
   }
 
+  /**
+   * Sets the <a
+   * href="https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/">namespace</a>
+   * into which the release will be installed.
+   *
+   * @param releaseNamespace the <a
+   * href="https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/">namespace</a>
+   * into which the release will be installed; may be {@code null}
+   *
+   * @see #getReleaseNamespace()
+   */
   public void setReleaseNamespace(final String releaseNamespace) {
     this.releaseNamespace = releaseNamespace;
   }
@@ -213,14 +346,42 @@ public class InstallReleaseMojo extends AbstractMutatingReleaseMojo {
     this.reuseReleaseName = reuseReleaseName;
   }
 
+  /**
+   * Returns a YAML {@link String} representing the values to use to
+   * customize the installation.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * <p>Overrides of this method may return {@code null}.</p>
+   *
+   * @return a YAML {@link String} representing the values to use to
+   * customize the installation, or {@code null}
+   *
+   * @see #setValuesYaml(String)
+   */
   public String getValuesYaml() {
     return this.valuesYaml;
   }
 
+  /**
+   * Installs a YAML {@link String} representing the values to use to
+   * customize the installation.
+   *
+   * @param valuesYaml the YAML {@link String} representing the values to use to
+   * customize the installation; may be {@code null}
+   *
+   * @see #getValuesYaml()
+   */
   public void setValuesYaml(final String valuesYaml) {
     this.valuesYaml = valuesYaml;
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * <p>This implementation allows the supplied {@code name} to be
+   * {@code null} or {@linkplain String#isEmpty() empty}.</p>
+   */
   @Override
   protected void validateReleaseName(final String name) {
     if (name != null && !name.isEmpty()) {

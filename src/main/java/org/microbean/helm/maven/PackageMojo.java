@@ -174,7 +174,7 @@ public class PackageMojo extends AbstractHelmMojo {
         assert targetDirectory != null;
         final Path targetDirectoryPath = Paths.get(targetDirectory);
         assert targetDirectoryPath != null;
-        final Path helmChartsDirectoryPath = targetDirectoryPath.resolve("helm/charts");
+        final Path helmChartsDirectoryPath = targetDirectoryPath.resolve("generated-sources/helm/charts");
         assert helmChartsDirectoryPath != null;
         assert helmChartsDirectoryPath.isAbsolute();
         final Path chartDirectoryPath = helmChartsDirectoryPath.resolve(chartName + ".tgz");

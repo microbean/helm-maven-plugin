@@ -37,6 +37,18 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.microbean.helm.ReleaseManager;
 import org.microbean.helm.Tiller;
 
+/**
+ * An {@link AbstractHelmMojo} that provides other <a
+ * href="https://microbean.github.io/microbean-helm/">Helm</a>-related
+ * <a
+ * href="https://maven.apache.org/developers/mojo-api-specification.html">mojo</a>
+ * implementations the ability to work with a {@link ReleaseManager}.
+ *
+ * @author <a href="https://about.me/lairdnelson"
+ * target="_parent">Laird Nelson</a>
+ *
+ * @see #execute(Callable)
+ */
 public abstract class AbstractReleaseMojo extends AbstractHelmMojo {
 
 
@@ -44,10 +56,17 @@ public abstract class AbstractReleaseMojo extends AbstractHelmMojo {
    * Instance fields.
    */
 
-  
-  @Parameter
+
+  /**
+   * Whether to skip execution.
+   */
+  @Parameter(defaultValue = "false")
   private boolean skip;
-  
+
+  /**
+   * The {@link Config} describing how a {@link
+   * DefaultKubernetesClient} should connect to a Kubernetes cluster.
+   */
   @Parameter
   private Config clientConfiguration;
 
@@ -56,7 +75,10 @@ public abstract class AbstractReleaseMojo extends AbstractHelmMojo {
    * Constructors.
    */
 
-  
+
+  /**
+   * Creates a new {@link AbstractReleaseMojo}.
+   */
   protected AbstractReleaseMojo() {
     super();
   }
@@ -66,7 +88,19 @@ public abstract class AbstractReleaseMojo extends AbstractHelmMojo {
    * Public instance methods.
    */
 
-  
+
+  /**
+   * {@linkplain #getSkip() Skips} execution if instructed, or calls
+   * the {@link #execute(Callable)} method with a {@link Callable}
+   * containing the results of an invocation of the {@link
+   * #createReleaseManager(Tiller)} method.
+   *
+   * @exception MojoExecutionException if there was a problem
+   * executing this mojo
+   *
+   * @exception MojoFailureException if the mojo executed properly,
+   * but the job it was to perform failed in some way
+   */
   @Override
   public void execute() throws MojoExecutionException, MojoFailureException {
     final Log log = this.getLog();
@@ -110,18 +144,55 @@ public abstract class AbstractReleaseMojo extends AbstractHelmMojo {
     }
   }
 
+  /**
+   * Returns the {@link Config} describing how a {@link
+   * DefaultKubernetesClient} is to connect to a Kubernetes cluster.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * <p>Overrides of this method may return {@code null}.</p>
+   *
+   * @return a {@link Config}, or {@code null}
+   *
+   * @see #setClientConfiguration(Config)
+   */
   public Config getClientConfiguration() {
     return this.clientConfiguration;
   }
 
+  /**
+   * Installs the {@link Config} describing how a {@link
+   * DefaultKubernetesClient} is to connect to a Kubernetes cluster.
+   *
+   * @param config the {@link Config} to use; may be {@code null}
+   *
+   * @see #getClientConfiguration()
+   */
   public void setClientConfiguration(final Config config) {
     this.clientConfiguration = config;
   }
 
+  /**
+   * Returns {@code true} if this {@link AbstractReleaseMojo} should
+   * not execute.
+   *
+   * @return {@code true} if this {@link AbstractReleaseMojo} should
+   * not execute; {@code false} otherwise
+   *
+   * @see #setSkip(boolean)
+   */
   public boolean getSkip() {
     return this.skip;
   }
 
+  /**
+   * Controls whether this {@link AbstractReleaseMojo} should execute.
+   *
+   * @param skip if {@code true}, this {@link AbstractReleaseMojo}
+   * will not execute
+   *
+   * @see #getSkip()
+   */
   public void setSkip(final boolean skip) {
     this.skip = skip;
   }
@@ -131,9 +202,37 @@ public abstract class AbstractReleaseMojo extends AbstractHelmMojo {
    * Protected instance methods.
    */
   
-  
+
+  /**
+   * Performs a release-oriented task using a {@link ReleaseManager}
+   * {@linkplain Callable#call() available} from the supplied {@link
+   * Callable}.
+   *
+   * @param releaseManagerCallable the {@link Callable} that will
+   * provide a {@link ReleaseManager}; must not be {@code null}
+   *
+   * @exception Exception if an error occurs
+   */
   protected abstract void execute(final Callable<ReleaseManager> releaseManagerCallable) throws Exception;
 
+  /**
+   * Creates a {@link DefaultKubernetesClient} for communicating with
+   * Kubernetes clusters.
+   *
+   * <p>This method never returns {@code null}.</p>
+   *
+   * <p>Overrides of this method must not return {@code null}.</p>
+   *
+   * <p>The default implementation calls the {@link
+   * #getClientConfiguration()} method and {@linkplain
+   * DefaultKubernetesClient#DefaultKubernetesClient(Config) uses its
+   * return value}, unless it is {@code null}, in which case a new
+   * {@link DefaultKubernetesClient} is created via its {@linkplain
+   * DefaultKubernetesClient#DefaultKubernetesClient() no-argument
+   * constructor}.</p>
+   *
+   * @excepiton IOException if there was a problem creating the client
+   */
   protected DefaultKubernetesClient createClient() throws IOException {
     final DefaultKubernetesClient client;
     final Config config = this.getClientConfiguration();
@@ -144,17 +243,78 @@ public abstract class AbstractReleaseMojo extends AbstractHelmMojo {
     }
     return client;
   }
-  
+
+  /**
+   * Creates a {@link Tiller} and returns it.
+   *
+   * <p>This method never returns {@code null}.</p>
+   *
+   * <p>Overrides of this method must not return {@code null}.</p>
+   *
+   * <p>This implementation passes the supplied {@link
+   * DefaultKubernetesClient} to the <a
+   * href="https://microbean.github.io/microbean-helm/apidocs/org/microbean/helm/Tiller.html#Tiller-T-">appropriate
+   * <code>Tiller</code> constructor</a>.</p>
+   *
+   * @param client the {@link DefaultKubernetesClient} to use to
+   * communicate with a Kubernetes cluster; must not be {@code null}
+   *
+   * @return a new {@link Tiller}; never {@code null}
+   *
+   * @exception NullPointerException if {@code client} is {@code null}
+   *
+   * @exception IOException if there was a problem creating a {@link
+   * Tiller}
+   */
   protected Tiller createTiller(final DefaultKubernetesClient client) throws IOException {
     Objects.requireNonNull(client);
     return new Tiller(client);
   }
 
+  /**
+   * Creates a {@link ReleaseManager} and returns it.
+   *
+   * <p>This method never returns {@code null}.</p>
+   *
+   * <p>Overrides of this method must not return {@code null}.</p>
+   *
+   * <p>This implementation passes the supplied {@link
+   * Tiller} to the {@linkplain ReleaseManager#ReleaseManager(Tiller)
+   * appropriate <code>ReleaseManager</code> constructor}.</p>
+   *
+   * @param tiller the {@link Tiller} to use to communicate with a
+   * Tiller server; must not be {@code null}
+   *
+   * @return a new {@link ReleaseManager}; never {@code null}
+   *
+   * @exception NullPointerException if {@code tiller} is {@code null}
+   *
+   * @exception IOException if there was a problem creating a {@link
+   * ReleaseManager}
+   */
   protected ReleaseManager createReleaseManager(final Tiller tiller) throws IOException {
     Objects.requireNonNull(tiller);
     return new ReleaseManager(tiller);
   }
 
+  /**
+   * Validates a <a
+   * href="https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/">Kubernetes
+   * namespace</a> for correctness.
+   *
+   * <p>The default implementation checks the supplied {@code
+   * namespace} to see if it is less than or equal to {@value
+   * ReleaseManager#DNS_LABEL_MAX_LENGTH} characters, and if it
+   * {@linkplain Matcher#matches() matches} the value of the {@link
+   * ReleaseManager#DNS_LABEL_PATTERN} field.</p>
+   *
+   * @param namespace the <a
+   * href="https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/">namespace</a>
+   * to validate; may be {@code null}
+   *
+   * @exception IllegalArgumentException if {@code namespace} is
+   * invalid
+   */
   protected void validateNamespace(final String namespace) {
     if (namespace != null) {
       final int namespaceLength = namespace.length();
@@ -175,15 +335,71 @@ public abstract class AbstractReleaseMojo extends AbstractHelmMojo {
    * Inner and nested classes.
    */
 
-  
+
+  /**
+   * A {@link Callable} whose {@link #call()} method yields the same
+   * {@link ReleaseManager} for every invocation, {@linkplain
+   * AbstractReleaseMojo#createReleaseManager(Tiller) creating one} if
+   * necessary.
+   *
+   * @author <a href="https://about.me/lairdnelson"
+   * target="_parent">Laird Nelson</a>
+   *
+   * @see AbstractReleaseMojo#createReleaseManager(Tiller)
+   *
+   * @see AbstractReleaseMojo#createTiller(DefaultKubernetesClient)
+   *
+   * @see AbstractReleaseMojo#createClient()
+   */
   private final class ReleaseManagerCallable implements Callable<ReleaseManager> {
 
+
+    /*
+     * Instance fields.
+     */
+
+
+    /**
+     * The {@link ReleaseManager} to return from the {@link #call()}
+     * method.
+     *
+     * <p>This field may be {@code null}.</p>
+     *
+     * @sed #call()
+     */
     private ReleaseManager releaseManager;
-    
+
+
+    /*
+     * Constructors.
+     */
+
+
+    /**
+     * Creates a new {@link ReleaseManagerCallable}.
+     */
     private ReleaseManagerCallable() {
       super();
     }
 
+
+    /*
+     * Instance methods.
+     */
+
+
+    /**
+     * Returns a {@link ReleaseManager}, {@linkplain
+     * AbstractReleaseMojo#createReleaseManager(Tiller) creating one}
+     * if necessary.
+     *
+     * <p>This method never returns {@code null}.</p>
+     *
+     * @return a {@link ReleaseManager}; never {@code null}
+     *
+     * @exception IOException if there was a problem creating a {@link
+     * ReleaseManager}
+     */
     @Override
     public final ReleaseManager call() throws IOException {
       if (this.releaseManager == null) {
