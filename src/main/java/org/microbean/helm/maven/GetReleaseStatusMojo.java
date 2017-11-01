@@ -34,6 +34,12 @@ import org.apache.maven.plugins.annotations.Parameter;
 
 import org.microbean.helm.ReleaseManager;
 
+/**
+ * Retrieves the status of a release version.
+ *
+ * @author <a href="https://about.me/lairdnelson"
+ * target="_parent">Laird Nelson</a>
+ */
 @Mojo(name = "status")
 public class GetReleaseStatusMojo extends AbstractSingleVersionedReleaseMojo {
 
@@ -43,6 +49,12 @@ public class GetReleaseStatusMojo extends AbstractSingleVersionedReleaseMojo {
    */
   
 
+  /**
+   * A {@link List} of <a
+   * href="apidocs/org/microbean/helm/maven/ReleaseStatusListener.html">{@code
+   * ReleaseStatusListener}</a>s whose elements will be notified of
+   * the status retrieval.
+   */
   @Parameter(alias = "releaseStatusListenersList")
   private List<ReleaseStatusListener> releaseStatusListeners;
   
@@ -51,7 +63,10 @@ public class GetReleaseStatusMojo extends AbstractSingleVersionedReleaseMojo {
    * Constructors.
    */
   
-  
+
+  /**
+   * Creates a new {@link GetReleaseStatusMojo}.
+   */
   public GetReleaseStatusMojo() {
     super();
   }
@@ -62,6 +77,15 @@ public class GetReleaseStatusMojo extends AbstractSingleVersionedReleaseMojo {
    */
   
 
+  /**
+   * {@inheritDoc}
+   *
+   * <p>This implementation retrieves the status for a {@linkplain
+   * #getReleaseName() given release} at a {@linkplain #getVersion()
+   * particular version} and {@linkplain
+   * ReleaseStatusListener#releaseStatusRetrieved(ReleaseStatusEvent)
+   * notifies} registered {@link ReleaseStatusListener}s.</p>
+   */
   @Override
   protected void execute(final Callable<ReleaseManager> releaseManagerCallable) throws Exception {
     Objects.requireNonNull(releaseManagerCallable);
@@ -120,6 +144,18 @@ public class GetReleaseStatusMojo extends AbstractSingleVersionedReleaseMojo {
    */
 
   
+  /**
+   * Adds a {@link ReleaseStatusListener} that will be {@linkplain
+   * ReleaseStatusListener#releaseStatusRetrieved(ReleaseStatusEvent)
+   * notified when a release version's status is retrieved
+   *
+   * @param listener the {@link ReleaseStatusListener} to add; may be
+   * {@code null} in which case no action will be taken
+   *
+   * @see #removeReleaseStatusListener(ReleaseStatusListener)
+   *
+   * @see #getReleaseStatusListenersList()
+   */
   public void addReleaseStatusListener(final ReleaseStatusListener listener) {
     if (listener != null) {
       if (this.releaseStatusListeners == null) {
@@ -129,12 +165,37 @@ public class GetReleaseStatusMojo extends AbstractSingleVersionedReleaseMojo {
     }
   }
 
+  /**
+   * Removes a {@link ReleaseStatusListener} from this {@link
+   * GetReleaseStatusMojo}.
+   *
+   * @param listener the {@link ReleaseStatusListener} to remove; may
+   * be {@code null} in which case no action will be taken
+   *
+   * @see #addReleaseStatusListener(ReleaseStatusListener)
+   *
+   * @see #getReleaseStatusListenersList()
+   */
   public void removeReleaseStatusListener(final ReleaseStatusListener listener) {
     if (listener != null && this.releaseStatusListeners != null) {
       this.releaseStatusListeners.remove(listener);
     }
   }
-  
+
+  /**
+   * Invokes the {@link #getReleaseStatusListenersList()} method and
+   * {@linkplain Collection#toArray(Object[]) converts its return
+   * value to an array}.
+   *
+   * <p>This method never returns {@code null}.</p>
+   *
+   * <p>Overrides of this method must not return {@code null}.</p>
+   *
+   * @return a non-{@code null} array of {@link
+   * ReleaseStatusListener}s
+   *
+   * @see #getReleaseStatusListenersList()
+   */
   public ReleaseStatusListener[] getReleaseStatusListeners() {
     final Collection<ReleaseStatusListener> listeners = this.getReleaseStatusListenersList();
     if (listeners == null || listeners.isEmpty()) {
@@ -144,10 +205,47 @@ public class GetReleaseStatusMojo extends AbstractSingleVersionedReleaseMojo {
     }
   }
 
+  /**
+   * Returns the {@link List} of {@link ReleaseStatusListener}s whose
+   * elements will be {@linkplain
+   * ReleaseStatusListener#releaseStatusRetrieved(ReleaseStatusEvent)
+   * notified when a release version's status is retrieved.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * <p>Overrides of this method are permitted to return {@code
+   * null}.</p>
+   *
+   * @return a {@link List} of {@link ReleaseStatusListener}s, or
+   * {@code null}
+   *
+   * @see #setReleaseStatusListenersList(List)
+   *
+   * @see #addReleaseStatusListener(ReleaseStatusListener)
+   *
+   * @see #removeReleaseStatusListener(ReleaseStatusListener)
+   */
   public List<ReleaseStatusListener> getReleaseStatusListenersList() {
     return this.releaseStatusListeners;
   }
 
+  /**
+   * Installs the {@link List} of {@link ReleaseStatusListener}s whose
+   * elements will be {@linkplain
+   * ReleaseStatusListener#releaseStatusRetrieved(ReleaseStatusEvent)
+   * notified when a release version's status is retrieved}.
+   *
+   * @param releaseStatusListeners the {@link List} of {@link
+   * ReleaseStatusListener}s whose elements will be {@linkplain
+   * ReleaseStatusListener#releaseStatusRetrieved(ReleaseStatusEvent)
+   * notified when a release status is retrieved}; may be {@code null}
+   *
+   * @see #getReleaseStatusListenersList()
+   *
+   * @see #addReleaseStatusListener(ReleaseStatusListener)
+   *
+   * @see #removeReleaseStatusListener(ReleaseStatusListener)
+   */
   public void setReleaseStatusListenersList(final List<ReleaseStatusListener> releaseStatusListeners) {
     this.releaseStatusListeners = releaseStatusListeners;
   }
