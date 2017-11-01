@@ -34,6 +34,12 @@ import org.apache.maven.plugins.annotations.Parameter;
 
 import org.microbean.helm.ReleaseManager;
 
+/**
+ * Retrieves the content of a release.
+ *
+ * @author <a href="https://about.me/lairdnelson"
+ * target="_parent">Laird Nelson</a>
+ */
 @Mojo(name = "content")
 public class GetReleaseContentMojo extends AbstractSingleVersionedReleaseMojo {
 
@@ -42,7 +48,12 @@ public class GetReleaseContentMojo extends AbstractSingleVersionedReleaseMojo {
    * Instance fields.
    */
   
-
+  /**
+   * A {@link List} of <a
+   * href="apidocs/org/microbean/helm/maven/ReleaseContentListener.html">{@code
+   * ReleaseContentListener}</a>s that will be notified of a release's
+   * content retrieval.
+   */
   @Parameter(alias = "releaseContentListenersList")
   private List<ReleaseContentListener> releaseContentListeners;
   
@@ -51,7 +62,10 @@ public class GetReleaseContentMojo extends AbstractSingleVersionedReleaseMojo {
    * Constructors.
    */
   
-  
+
+  /**
+   * Creates a new {@link GetReleaseContentMojo}.
+   */
   public GetReleaseContentMojo() {
     super();
   }
@@ -62,12 +76,25 @@ public class GetReleaseContentMojo extends AbstractSingleVersionedReleaseMojo {
    */
   
 
+  /**
+   * {@inheritDoc}
+   *
+   * <p>This implementation retrieves the content of a particular
+   * version of a single release and {@linkplain
+   * ReleaseContentListener#releaseContentRetrieved(ReleaseContentEvent)
+   * notifies registers listeners}.</p>
+   */
   @Override
   protected void execute(final Callable<ReleaseManager> releaseManagerCallable) throws Exception {
     Objects.requireNonNull(releaseManagerCallable);
     final Log log = this.getLog();
     assert log != null;
 
+    final Integer version = this.getVersion();
+    if (version == null) {
+      throw new IllegalStateException("version was not specified");
+    }
+    
     final Collection<? extends ReleaseContentListener> listeners = this.getReleaseContentListenersList();
     if (listeners == null || listeners.isEmpty()) {
       if (log.isInfoEnabled()) {
@@ -84,7 +111,7 @@ public class GetReleaseContentMojo extends AbstractSingleVersionedReleaseMojo {
       requestBuilder.setName(releaseName);
     }
 
-    requestBuilder.setVersion(this.getVersion());
+    requestBuilder.setVersion(version.intValue());
 
     final ReleaseManager releaseManager = releaseManagerCallable.call();
     if (releaseManager == null) {
@@ -115,6 +142,18 @@ public class GetReleaseContentMojo extends AbstractSingleVersionedReleaseMojo {
    */
 
   
+  /**
+   * Adds a {@link ReleaseContentListener} that will be {@linkplain
+   * ReleaseContentListener#releaseContentRetrieved(ReleaseContentEvent)
+   * notified when a release's content is retrieved}.
+   *
+   * @param listener the {@link ReleaseContentListener} to add; may be
+   * {@code null} in which case no action will be taken
+   *
+   * @see #removeReleaseContentListener(ReleaseContentListener)
+   *
+   * @see #getReleaseContentListenersList()
+   */
   public void addReleaseContentListener(final ReleaseContentListener listener) {
     if (listener != null) {
       if (this.releaseContentListeners == null) {
@@ -124,12 +163,36 @@ public class GetReleaseContentMojo extends AbstractSingleVersionedReleaseMojo {
     }
   }
 
+  /**
+   * Removes a {@link ReleaseContentListener} from this {@link
+   * TestReleaseMojo}.
+   *
+   * @param listener the {@link ReleaseContentListener} to remove; may be
+   * {@code null} in which case no action will be taken
+   *
+   * @see #addReleaseContentListener(ReleaseContentListener)
+   *
+   * @see #getReleaseContentListenersList()
+   */
   public void removeReleaseContentListener(final ReleaseContentListener listener) {
     if (listener != null && this.releaseContentListeners != null) {
       this.releaseContentListeners.remove(listener);
     }
   }
-  
+
+  /**
+   * Invokes the {@link #getReleaseContentListenersList()} method and
+   * {@linkplain Collection#toArray(Object[]) converts its return
+   * value to an array}.
+   *
+   * <p>This method never returns {@code null}.</p>
+   *
+   * <p>Overrides of this method must not return {@code null}.</p>
+   *
+   * @return a non-{@code null} array of {@link ReleaseContentListener}s
+   *
+   * @see #getReleaseContentListenersList()
+   */
   public ReleaseContentListener[] getReleaseContentListeners() {
     final Collection<ReleaseContentListener> listeners = this.getReleaseContentListenersList();
     if (listeners == null || listeners.isEmpty()) {
@@ -139,10 +202,48 @@ public class GetReleaseContentMojo extends AbstractSingleVersionedReleaseMojo {
     }
   }
 
+  /**
+   * Returns the {@link List} of {@link ReleaseContentListener}s whose
+   * elements will be {@linkplain
+   * ReleaseContentListener#releaseContentRetrieved(ReleaseContentEvent)
+   * notified when the tests complete}.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * <p>Overrides of this method are permitted to return {@code
+   * null}.</p>
+   *
+   * @return a {@link List} of {@link ReleaseContentListener}s, or
+   * {@code null}
+   *
+   * @see #setReleaseContentListenersList(List)
+   *
+   * @see #addReleaseContentListener(ReleaseContentListener)
+   *
+   * @see #removeReleaseContentListener(ReleaseContentListener)
+   */
   public List<ReleaseContentListener> getReleaseContentListenersList() {
     return this.releaseContentListeners;
   }
 
+  /**
+   * Installs the {@link List} of {@link ReleaseContentListener}s
+   * whose elements will be {@linkplain
+   * ReleaseContentListener#releaseContentRetrieved(ReleaseContentEvent)
+   * notified when a release's contents are retrieved}.
+   *
+   * @param releaseContentListeners the {@link List} of {@link
+   * ReleaseContentListener}s whose elements will be {@linkplain
+   * ReleaseContentListener#releaseContentRetrieved(ReleaseContentEvent)
+   * notified when a release's contents are retrieved}; may be {@code
+   * null}
+   *
+   * @see #getReleaseContentListenersList()
+   *
+   * @see #addReleaseContentListener(ReleaseContentListener)
+   *
+   * @see #removeReleaseContentListener(ReleaseContentListener)
+   */
   public void setReleaseContentListenersList(final List<ReleaseContentListener> releaseContentListeners) {
     this.releaseContentListeners = releaseContentListeners;
   }

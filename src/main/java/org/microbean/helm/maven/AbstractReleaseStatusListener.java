@@ -23,12 +23,58 @@ import hapi.services.tiller.Tiller.GetReleaseStatusResponseOrBuilder;
 
 import org.apache.maven.plugin.logging.Log;
 
+/**
+ * A {@link ReleaseStatusListener} that {@linkplain
+ * Log#info(CharSequence) logs} the {@link
+ * hapi.services.tiller.Tiller.GetReleaseStatusResponseOrBuilder}
+ * {@linkplain
+ * ReleaseStatusEvent#getReleaseStatusResponseOrBuilder() associated
+ * with a <code>ReleaseStatusEvent</code>}.
+ *
+ * @author <a href="https://about.me/lairdnelson"
+ * target="_parent">Laird Nelson</a>
+ *
+ * @see ReleaseStatusEvent
+ *
+ * @see ReleaseStatusListener
+ */
 public class AbstractReleaseStatusListener implements ReleaseStatusListener {
 
+
+  /*
+   * Constructors.
+   */
+
+  
+  /**
+   * Creates a new {@link AbstractReleaseStatusListener}.
+   */
   public AbstractReleaseStatusListener() {
     super();
   }
 
+
+  /*
+   * Instance methods.
+   */
+  
+
+  /**
+   * {@linkplain Log#info(CharSequence) Logs} the {@link
+   * hapi.services.tiller.Tiller.GetReleaseStatusResponseOrBuilder}
+   * {@linkplain
+   * ReleaseStatusEvent#getReleaseStatusResponseOrBuilder()
+   * associated with a <code>ReleaseStatusEvent</code>}.
+   *
+   * @param event the {@link ReleaseStatusEvent} describing the
+   * release status; may be {@code null} in which case no action will
+   * be taken
+   *
+   * @see ReleaseStatusEvent
+   *
+   * @see
+   * hapi.services.tiller.Tiller.GetReleaseStatusResponseOrBuilder#toString()
+   */
   @Override
   public void releaseStatusRetrieved(final ReleaseStatusEvent event) {
     if (event != null) {

@@ -34,6 +34,12 @@ import org.apache.maven.plugins.annotations.Parameter;
 
 import org.microbean.helm.ReleaseManager;
 
+/**
+ * Retrieves the history of a release.
+ *
+ * @author <a href="https://about.me/lairdnelson"
+ * target="_parent">Laird Nelson</a>
+ */
 @Mojo(name = "history")
 public class GetHistoryMojo extends AbstractSingleReleaseMojo {
 
@@ -43,9 +49,18 @@ public class GetHistoryMojo extends AbstractSingleReleaseMojo {
    */
   
 
+  /**
+   * The maximum number of versions to return.
+   */
   @Parameter
   private int max;
 
+  /**
+   * A {@link List} of <a
+   * href="apidocs/org/microbean/helm/maven/ReleaseHistoryListener.html">{@code
+   * ReleaseHistoryListener}</a>s whose elements will be notified of
+   * each item in the history.
+   */
   @Parameter(alias = "releaseHistoryListenersList")
   private List<ReleaseHistoryListener> releaseHistoryListeners;
   
@@ -54,7 +69,10 @@ public class GetHistoryMojo extends AbstractSingleReleaseMojo {
    * Constructors.
    */
   
-  
+
+  /**
+   * Creates a new {@link GetHistoryMojo}.
+   */
   public GetHistoryMojo() {
     super();
   }
@@ -65,6 +83,14 @@ public class GetHistoryMojo extends AbstractSingleReleaseMojo {
    */
   
 
+  /**
+   * {@inheritDoc}
+   *
+   * <p>This implementation retrieves the history for a {@linkplain
+   * #getReleaseName() given release} and {@linkplain
+   * ReleaseHistoryListener#releaseHistoryRetrieved(ReleaseHistoryEvent)
+   * notifies} registered {@link ReleaseHistoryListener}s.</p>
+   */
   @Override
   protected void execute(final Callable<ReleaseManager> releaseManagerCallable) throws Exception {
     Objects.requireNonNull(releaseManagerCallable);
@@ -117,15 +143,41 @@ public class GetHistoryMojo extends AbstractSingleReleaseMojo {
    * Public instance methods.
    */
 
-  
+
+  /**
+   * Returns the maximum number of history entries to retrieve.
+   *
+   * @return the maximum number of history entries to retrieve
+   *
+   * @see #setMax(int)
+   */
   public int getMax() {
     return this.max;
   }
 
+  /**
+   * Sets the maximum number of history entries to retrieve.
+   *
+   * @param max the maximum number of history entries to retrieve
+   *
+   * @see #getMax()
+   */
   public void setMax(final int max) {
     this.max = max;
   }
 
+  /**
+   * Adds a {@link ReleaseHistoryListener} that will be {@linkplain
+   * ReleaseHistoryListener#releaseHistoryRetrieved(ReleaseHistoryEvent)
+   * notified when a release history is retrieved
+   *
+   * @param listener the {@link ReleaseHistoryListener} to add; may be
+   * {@code null} in which case no action will be taken
+   *
+   * @see #removeReleaseHistoryListener(ReleaseHistoryListener)
+   *
+   * @see #getReleaseHistoryListenersList()
+   */
   public void addReleaseHistoryListener(final ReleaseHistoryListener listener) {
     if (listener != null) {
       if (this.releaseHistoryListeners == null) {
@@ -135,12 +187,37 @@ public class GetHistoryMojo extends AbstractSingleReleaseMojo {
     }
   }
 
+  /**
+   * Removes a {@link ReleaseHistoryListener} from this {@link
+   * GetHistoryMojo}.
+   *
+   * @param listener the {@link ReleaseHistoryListener} to remove; may
+   * be {@code null} in which case no action will be taken
+   *
+   * @see #addReleaseHistoryListener(ReleaseHistoryListener)
+   *
+   * @see #getReleaseHistoryListenersList()
+   */
   public void removeReleaseHistoryListener(final ReleaseHistoryListener listener) {
     if (listener != null && this.releaseHistoryListeners != null) {
       this.releaseHistoryListeners.remove(listener);
     }
   }
-  
+
+  /**
+   * Invokes the {@link #getReleaseHistoryListenersList()} method and
+   * {@linkplain Collection#toArray(Object[]) converts its return
+   * value to an array}.
+   *
+   * <p>This method never returns {@code null}.</p>
+   *
+   * <p>Overrides of this method must not return {@code null}.</p>
+   *
+   * @return a non-{@code null} array of {@link
+   * ReleaseHistoryListener}s
+   *
+   * @see #getReleaseHistoryListenersList()
+   */
   public ReleaseHistoryListener[] getReleaseHistoryListeners() {
     final Collection<ReleaseHistoryListener> listeners = this.getReleaseHistoryListenersList();
     if (listeners == null || listeners.isEmpty()) {
@@ -150,10 +227,48 @@ public class GetHistoryMojo extends AbstractSingleReleaseMojo {
     }
   }
 
+  /**
+   * Returns the {@link List} of {@link ReleaseHistoryListener}s whose
+   * elements will be {@linkplain
+   * ReleaseHistoryListener#releaseHistoryRetrieved(ReleaseHistoryEvent)
+   * notified when a release history is retrieved.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * <p>Overrides of this method are permitted to return {@code
+   * null}.</p>
+   *
+   * @return a {@link List} of {@link ReleaseHistoryListener}s, or
+   * {@code null}
+   *
+   * @see #setReleaseHistoryListenersList(List)
+   *
+   * @see #addReleaseHistoryListener(ReleaseHistoryListener)
+   *
+   * @see #removeReleaseHistoryListener(ReleaseHistoryListener)
+   */
   public List<ReleaseHistoryListener> getReleaseHistoryListenersList() {
     return this.releaseHistoryListeners;
   }
 
+  /**
+   * Installs the {@link List} of {@link ReleaseHistoryListener}s
+   * whose elements will be {@linkplain
+   * ReleaseHistoryListener#releaseHistoryRetrieved(ReleaseHistoryEvent)
+   * notified when a release history is retrieved}.
+   *
+   * @param releaseHistoryListeners the {@link List} of {@link
+   * ReleaseHistoryListener}s whose elements will be {@linkplain
+   * ReleaseHistoryListener#releaseHistoryRetrieved(ReleaseHistoryEvent)
+   * notified when a release history is retrieved}; may be {@code
+   * null}
+   *
+   * @see #getReleaseHistoryListenersList()
+   *
+   * @see #addReleaseHistoryListener(ReleaseHistoryListener)
+   *
+   * @see #removeReleaseHistoryListener(ReleaseHistoryListener)
+   */
   public void setReleaseHistoryListenersList(final List<ReleaseHistoryListener> releaseHistoryListeners) {
     this.releaseHistoryListeners = releaseHistoryListeners;
   }

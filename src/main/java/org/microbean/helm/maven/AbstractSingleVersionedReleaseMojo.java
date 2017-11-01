@@ -22,20 +22,73 @@ import org.apache.maven.plugins.annotations.Parameter;
 
 import org.microbean.helm.ReleaseManager;
 
+/**
+ * An {@link AbstractSingleReleaseMojo} whose implementations operate
+ * on a particular versioned release.
+ *
+ * @author <a href="https://about.me/lairdnelson"
+ * target="_parent">Laird Nelson</a>
+ */
 public abstract class AbstractSingleVersionedReleaseMojo extends AbstractSingleReleaseMojo {
 
-  @Parameter
-  private int version;
-  
+
+  /*
+   * Instance fields.
+   */
+
+
+  /**
+   * The version of the release.
+   */
+  @Parameter(required = true)
+  private Integer version;
+
+
+  /*
+   * Constructors.
+   */
+
+
+  /**
+   * Creates a new {@link AbstractSingleVersionedReleaseMojo}.
+   */
   protected AbstractSingleVersionedReleaseMojo() {
     super();
   }
 
-  public int getVersion() {
+
+  /*
+   * Instance methods.
+   */
+
+
+  /**
+   * Returns the version of the release to operate on.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * <p>Overrides of this method are permitted to return {@code
+   * null}.</p>
+   *
+   * @return the version of the release to operate on, or {@code null}
+   *
+   * @see #setVersion(Integer)
+   */
+  public Integer getVersion() {
     return this.version;
   }
 
-  public void setVersion(final int version) {
+  /**
+   * Sets the version of the release to operate on.
+   *
+   * @param version the release version; must not be {@code null}
+   *
+   * @exception NullPointerException if {@code version} is {@code
+   * null}
+   *
+   * @see #getVersion()
+   */
+  public void setVersion(final Integer version) {
     this.version = version;
   }
   
