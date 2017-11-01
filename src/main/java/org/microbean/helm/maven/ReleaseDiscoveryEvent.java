@@ -16,29 +16,117 @@
  */
 package org.microbean.helm.maven;
 
-import java.util.EventObject;
+import java.io.Serializable; // for javadoc only
+
+import java.util.EventObject; // for javadoc only
 import java.util.Objects;
 
 import hapi.services.tiller.Tiller.ListReleasesResponseOrBuilder;
 
-import org.apache.maven.plugin.logging.Log;
-
+/**
+ * An {@link AbstractReleaseEvent} describing a discovery of a <a
+ * href="https://docs.helm.sh/glossary/#release">Helm release</a>
+ * performed by a {@link ListReleasesMojo} instance.
+ *
+ * @author <a href="https://about.me/lairdnelson"
+ * target="_parent">Laird Nelson</a>
+ *
+ * @see ReleaseDiscoveryListener
+ *
+ * @see ListReleasesMojo
+ */
 public class ReleaseDiscoveryEvent extends AbstractReleaseEvent {
 
-  private static final long serialVersionUID = 1L;
   
+  /*
+   * Static fields.
+   */
+
+
+  /**
+   * The version of this class for {@linkplain Serializable
+   * serialization} purposes.
+   */
+  private static final long serialVersionUID = 1L;
+    
+
+  /*
+   * Instance fields.
+   */
+
+
+  /**
+   * The {@link
+   * hapi.services.tiller.Tiller.ListReleasesResponseOrBuilder}
+   * describing the release discovery.
+   *
+   * <p>This field will never be {@code null}.</p>
+   *
+   * @see #ReleaseDiscoveryEvent(ListReleasesMojo,
+   * hapi.services.tiller.Tiller.ListReleasesResponseOrBuilder)
+   */
   private final ListReleasesResponseOrBuilder listReleasesResponseOrBuilder;
   
-  public ReleaseDiscoveryEvent(final ListReleasesMojo source, final Log log, final ListReleasesResponseOrBuilder listReleasesResponseOrBuilder) {
-    super(source, log);
+
+  /*
+   * Constructors.
+   */
+
+
+  /**
+   * Creates a new {@link ReleaseDiscoveryEvent}.
+   *
+   * @param source the {@link ListReleasesMojo} responsible for
+   * retrieving the release; must not be {@code null}
+   *
+   * @param listReleasesResponseOrBuilder the {@link
+   * hapi.services.tiller.Tiller.ListReleasesResponseOrBuilder}
+   * describing the release retrieval; must not be {@code null}
+   *
+   * @exception IllegalArgumentException if {@code source} is {@code
+   * null}; thrown by the {@link EventObject#EventObject(Object)}
+   * constructor
+   *
+   * @exception NullPointerException if {@code
+   * listReleasesResponseOrBuilder} is {@code null}
+   */
+  public ReleaseDiscoveryEvent(final ListReleasesMojo source, final ListReleasesResponseOrBuilder listReleasesResponseOrBuilder) {
+    super(source);
     Objects.requireNonNull(listReleasesResponseOrBuilder);
     this.listReleasesResponseOrBuilder = listReleasesResponseOrBuilder;
   }
 
+  
+  /*
+   * Instance methods.
+   */
+
+
+  /**
+   * Returns the {@link
+   * hapi.services.tiller.Tiller.ListReleasesResponseOrBuilder}
+   * implementation representing the release retrieval.
+   *
+   * <p>This method never returns {@code null}.</p>
+   *
+   * @return the {@link
+   * hapi.services.tiller.Tiller.ListReleasesResponseOrBuilder}
+   * implementation representing the release retrieval; never {@code
+   * null}
+   */
   public final ListReleasesResponseOrBuilder getListReleasesResponseOrBuilder() {
     return this.listReleasesResponseOrBuilder;
   }
-
+  
+  /**
+   * Returns the {@link ListReleasesMojo} responsible for firing this
+   * event.
+   *
+   * <p>This method never returns {@code null}.</p>
+   *
+   * @return the {@link ListReleasesMojo} responsible for firing this
+   * event; never {@code null}
+   */
   @Override
   public final ListReleasesMojo getSource() {
     return (ListReleasesMojo)super.getSource();

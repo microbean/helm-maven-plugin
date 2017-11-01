@@ -100,7 +100,7 @@ public class GetReleaseContentMojo extends AbstractSingleVersionedReleaseMojo {
     final GetReleaseContentResponse getReleaseContentResponse = getReleaseContentResponseFuture.get();
     assert getReleaseContentResponse != null;
 
-    final ReleaseContentEvent event = new ReleaseContentEvent(this, log, getReleaseContentResponse);
+    final ReleaseContentEvent event = new ReleaseContentEvent(this, getReleaseContentResponse);
     for (final ReleaseContentListener listener : listeners) {
       if (listener != null) {
         listener.releaseContentRetrieved(event);

@@ -156,7 +156,7 @@ public class ListReleasesMojo extends AbstractReleaseMojo {
     while (listReleasesResponseIterator.hasNext()) {
       final ListReleasesResponse response = listReleasesResponseIterator.next();
       assert response != null;
-      final ReleaseDiscoveryEvent event = new ReleaseDiscoveryEvent(this, log, response);
+      final ReleaseDiscoveryEvent event = new ReleaseDiscoveryEvent(this, response);
       for (final ReleaseDiscoveryListener listener : listeners) {
         if (listener != null) {
           listener.releaseDiscovered(event);

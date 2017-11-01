@@ -127,9 +127,10 @@ public class InstallReleaseMojo extends AbstractMutatingReleaseMojo {
    * <code>file:/${project.build.directory}/generated-sources/helm/charts/${project.artifactId}</code>
    * will be used instead.
    */
-  @Parameter
+  @Parameter(required = true, defaultValue = "file:${project.build.directory}/generated-sources/helm/charts/${project.artifactId}")
   private URL chartUrl;
 
+  
   /*
    * Constructors.
    */
@@ -181,10 +182,10 @@ public class InstallReleaseMojo extends AbstractMutatingReleaseMojo {
 
     URL chartUrl = this.getChartUrl();
     if (chartUrl == null) {
-      final Path chartDirectoryPath = Paths.get(new StringBuilder(this.project.getBuild().getDirectory()).append("/generated-sources/helm/charts").append(this.project.getArtifactId()).toString());
-      assert chartDirectoryPath != null;
-      chartUrl = chartDirectoryPath.toUri().toURL();
-      if (!Files.isDirectory(chartDirectoryPath)) {
+      final Path chartPath = Paths.get(new StringBuilder(this.project.getBuild().getDirectory()).append("/generated-sources/helm/charts/").append(this.project.getArtifactId()).toString());
+      assert chartPath != null;
+      chartUrl = chartPath.toUri().toURL();
+      if (!Files.isDirectory(chartPath)) {
         throw new MojoExecutionException("Non-existent chartUrl: " + chartUrl);
       }
     }

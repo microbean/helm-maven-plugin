@@ -18,8 +18,31 @@ package org.microbean.helm.maven;
 
 import java.util.EventListener;
 
+/**
+ * An {@link EventListener} that is notified when the status about a
+ * <a href="https://docs.helm.sh/glossary/#release">Helm release</a>
+ * has been retrieved.
+ *
+ * @author <a href="https://about.me/lairdnelson"
+ * target="_parent">Laird Nelson</a>
+ *
+ * @see ReleaseStatusEvent
+ *
+ * @see GetReleaseStatusMojo
+ */
 public interface ReleaseStatusListener extends EventListener {
 
+  /**
+   * Called when the status of a <a
+   * href="https://docs.helm.sh/glossary/#release">Helm release</a> has
+   * been {@linkplain GetReleaseStatusMojo retrieved}.
+   *
+   * @param event the {@link ReleaseStatusEvent} describing the status
+   *
+   * @see ReleaseStatusEvent
+   *
+   * @see GetReleaseStatusMojo
+   */
   public void releaseStatusRetrieved(final ReleaseStatusEvent event);
   
 }

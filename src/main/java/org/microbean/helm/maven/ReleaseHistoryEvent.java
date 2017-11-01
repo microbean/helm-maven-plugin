@@ -16,29 +16,117 @@
  */
 package org.microbean.helm.maven;
 
-import java.util.EventObject;
+import java.io.Serializable; // for javadoc only
+
+import java.util.EventObject; // for javadoc only
 import java.util.Objects;
 
 import hapi.services.tiller.Tiller.GetHistoryResponseOrBuilder;
 
-import org.apache.maven.plugin.logging.Log;
-
+/**
+ * An {@link AbstractReleaseEvent} describing a retrieval of the
+ * history of a <a href="https://docs.helm.sh/glossary/#release">Helm
+ * release</a>.
+ *
+ * @author <a href="https://about.me/lairdnelson"
+ * target="_parent">Laird Nelson</a>
+ *
+ * @see ReleaseHistoryListener
+ *
+ * @see GetHistoryMojo
+ */
 public class ReleaseHistoryEvent extends AbstractReleaseEvent {
 
+  
+  /*
+   * Static fields.
+   */
+
+
+  /**
+   * The version of this class for {@linkplain Serializable
+   * serialization} purposes.
+   */
   private static final long serialVersionUID = 1L;
   
+
+  /*
+   * Instance fields.
+   */
+
+
+  /**
+   * The {@link
+   * hapi.services.tiller.Tiller.GetReleaseHistoryResponseOrBuilder}
+   * describing the history retrieval.
+   *
+   * <p>This field will never be {@code null}.</p>
+   *
+   * @see #ReleaseHistoryEvent(GetHistoryMojo,
+   * hapi.services.tiller.Tiller.GetHistoryResponseOrBuilder)
+   */
   private final GetHistoryResponseOrBuilder getHistoryResponseOrBuilder;
-  
-  public ReleaseHistoryEvent(final GetHistoryMojo source, final Log log, final GetHistoryResponseOrBuilder getHistoryResponseOrBuilder) {
-    super(source, log);
+
+
+  /*
+   * Constructors.
+   */
+
+
+  /**
+   * Creates a new {@link ReleaseHistoryEvent}.
+   *
+   * @param source the {@link GetHistoryMojo} responsible for
+   * retrieving the history; must not be {@code null}
+   *
+   * @param getReleaseHistoryResponseOrBuilder the {@link
+   * hapi.services.tiller.Tiller.GetReleaseHistoryResponseOrBuilder}
+   * describing the history retrieval; must not be {@code null}
+   *
+   * @exception IllegalArgumentException if {@code source} is {@code
+   * null}; thrown by the {@link EventObject#EventObject(Object)}
+   * constructor
+   *
+   * @exception NullPointerException if {@code
+   * getReleaseHistoryResponseOrBuilder} is {@code null}
+   */
+  public ReleaseHistoryEvent(final GetHistoryMojo source, final GetHistoryResponseOrBuilder getHistoryResponseOrBuilder) {
+    super(source);
     Objects.requireNonNull(getHistoryResponseOrBuilder);
     this.getHistoryResponseOrBuilder = getHistoryResponseOrBuilder;
   }
 
+  
+  /*
+   * Instance methods.
+   */
+
+
+  /**
+   * Returns the {@link
+   * hapi.services.tiller.Tiller.GetReleaseHistoryResponseOrBuilder}
+   * implementation representing the history retrieval.
+   *
+   * <p>This method never returns {@code null}.</p>
+   *
+   * @return the {@link
+   * hapi.services.tiller.Tiller.GetReleaseHistoryResponseOrBuilder}
+   * implementation representing the history retrieval; never {@code
+   * null}
+   */
   public final GetHistoryResponseOrBuilder getHistoryResponseOrBuilder() {
     return this.getHistoryResponseOrBuilder;
   }
 
+  /**
+   * Returns the {@link GetHistoryMojo} responsible for firing
+   * this event.
+   *
+   * <p>This method never returns {@code null}.</p>
+   *
+   * @return the {@link GetHistoryMojo} responsible for firing this
+   * event; never {@code null}
+   */
   @Override
   public final GetHistoryMojo getSource() {
     return (GetHistoryMojo)super.getSource();

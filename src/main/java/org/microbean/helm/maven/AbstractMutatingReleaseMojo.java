@@ -55,9 +55,9 @@ public abstract class AbstractMutatingReleaseMojo extends AbstractSingleReleaseM
   private boolean dryRun;
 
   /**
-   * The default timeout, in seconds, to use for Kubernetes
-   * operations; set to {@code 300} by default for parity with the
-   * {@code helm} command line program.
+   * The timeout, in seconds, to use for Kubernetes operations; set to
+   * {@code 300} by default for parity with the {@code helm} command
+   * line program.
    */
   @Parameter(defaultValue = "300")
   private long timeout; // in seconds

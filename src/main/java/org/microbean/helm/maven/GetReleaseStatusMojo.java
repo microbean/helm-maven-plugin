@@ -100,7 +100,7 @@ public class GetReleaseStatusMojo extends AbstractSingleVersionedReleaseMojo {
     final GetReleaseStatusResponse getReleaseStatusResponse = getReleaseStatusResponseFuture.get();
     assert getReleaseStatusResponse != null;
 
-    final ReleaseStatusEvent event = new ReleaseStatusEvent(this, log, getReleaseStatusResponse);
+    final ReleaseStatusEvent event = new ReleaseStatusEvent(this, getReleaseStatusResponse);
     for (final ReleaseStatusListener listener : listeners) {
       if (listener != null) {
         listener.releaseStatusRetrieved(event);

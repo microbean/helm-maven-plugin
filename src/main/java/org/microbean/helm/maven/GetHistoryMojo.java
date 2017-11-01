@@ -103,7 +103,7 @@ public class GetHistoryMojo extends AbstractSingleReleaseMojo {
     final GetHistoryResponse getHistoryResponse = getHistoryResponseFuture.get();
     assert getHistoryResponse != null;
 
-    final ReleaseHistoryEvent event = new ReleaseHistoryEvent(this, log, getHistoryResponse);
+    final ReleaseHistoryEvent event = new ReleaseHistoryEvent(this, getHistoryResponse);
     for (final ReleaseHistoryListener listener : listeners) {
       if (listener != null) {
         listener.releaseHistoryRetrieved(event);

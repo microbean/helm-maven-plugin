@@ -23,19 +23,65 @@ import hapi.services.tiller.Tiller.ListReleasesResponseOrBuilder;
 
 import org.apache.maven.plugin.logging.Log;
 
+/**
+ * A {@link ReleaseDiscoveryListener} that {@linkplain
+ * Log#info(CharSequence) logs} the {@link
+ * hapi.services.tiller.Tiller.ListReleasesResponseOrBuilder}
+ * {@linkplain
+ * ReleaseDiscoveryEvent#getListReleasesResponseOrBuilder() associated
+ * with a <code>ReleaseDiscoveryEvent</code>}.
+ *
+ * @author <a href="https://about.me/lairdnelson"
+ * target="_parent">Laird Nelson</a>
+ *
+ * @see ReleaseDiscoveryEvent
+ *
+ * @see ReleaseDiscoveryListener
+ */
 public class AbstractReleaseDiscoveryListener implements ReleaseDiscoveryListener {
 
+
+  /*
+   * Constructors.
+   */
+
+
+  /**
+   * Creates a new {@link AbstractReleaseDiscoveryListener}.
+   */
   public AbstractReleaseDiscoveryListener() {
     super();
   }
 
+  
+
+  /*
+   * Instance methods.
+   */
+  
+
+  /**
+   * {@linkplain Log#info(CharSequence) Logs} the {@link
+   * hapi.services.tiller.Tiller.ListReleasesResponseOrBuilder}
+   * {@linkplain
+   * ReleaseDiscoveryEvent#getListReleasesResponseOrBuilder()
+   * associated with a <code>ReleaseDiscoveryEvent</code>}.
+   *
+   * @param event the {@link ReleaseDiscoveryEvent} describing the
+   * release; may be {@code null} in which case no action will be
+   * taken
+   *
+   * @see ReleaseDiscoveryEvent
+   *
+   * @see
+   * hapi.services.tiller.Tiller.ListReleasesResponse#toString()
+   */
   @Override
   public void releaseDiscovered(final ReleaseDiscoveryEvent event) {
     if (event != null) {
-      final ListReleasesResponseOrBuilder listReleasesResponseOrBuilder = event.getListReleasesResponseOrBuilder();
       final Log log = event.getLog();
       if (log != null && log.isInfoEnabled()) {
-        log.info(String.valueOf(listReleasesResponseOrBuilder));
+        log.info(String.valueOf(event.getListReleasesResponseOrBuilder()));
       }
     }
   }

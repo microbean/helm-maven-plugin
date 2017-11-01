@@ -18,8 +18,32 @@ package org.microbean.helm.maven;
 
 import java.util.EventListener;
 
+/**
+ * An {@link EventListener} that is notified when a <a
+ * href="https://docs.helm.sh/glossary/#release">Helm release</a> has
+ * been retrieved, usually by a {@link ListReleasesMojo} instance.
+ *
+ * @author <a href="https://about.me/lairdnelson"
+ * target="_parent">Laird Nelson</a>
+ *
+ * @see ReleaseDiscoveryEvent
+ *
+ * @see ListReleasesMojo
+ */
 public interface ReleaseDiscoveryListener extends EventListener {
 
+  /**
+   * Called when a <a
+   * href="https://docs.helm.sh/glossary/#release">Helm release</a>
+   * has been {@linkplain ListReleasesMojo retrieved}.
+   *
+   * @param event the {@link ReleaseDiscoveryEvent} describing the
+   * release discovery
+   *
+   * @see ReleaseDiscoveryEvent
+   *
+   * @see ListReleasesMojo
+   */
   public void releaseDiscovered(final ReleaseDiscoveryEvent event);
   
 }

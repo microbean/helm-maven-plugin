@@ -17,6 +17,7 @@
 package org.microbean.helm.maven;
 
 import java.io.BufferedOutputStream;
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -50,13 +51,23 @@ import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
+
 import org.microbean.helm.chart.AbstractChartLoader;
 import org.microbean.helm.chart.AbstractChartWriter;
 import org.microbean.helm.chart.URLChartLoader;
 import org.microbean.helm.chart.TapeArchiveChartWriter;
 
+/**
+ * Packages a Helm chart from its raw materials.
+ *
+ * @author <a href="https://about.me/lairdnelson"
+ * target="_parent">Laird Nelson</a>
+ *
+ * @see #execute()
+ */
 @Mojo(name = "package")
-public class PackageMojo extends AbstractHelmMojo {
+public class PackageMojo extends AbstractHelmMojo implements Disposable {
 
 
   /*
@@ -64,12 +75,25 @@ public class PackageMojo extends AbstractHelmMojo {
    */
   
 
+  /**
+   * The {@link MavenProject} in effect.
+   *
+   * <p>This field is never {@code null}.</p>
+   *
+   * @see #PackageMojo(MavenProject)
+   */
   private final MavenProject project;
-  
+
+  /**
+   * Whether to skip execution.
+   */
   @Parameter(defaultValue = "false")
   private boolean skip;
-  
-  @Parameter(required = true)
+
+  /**
+   * A {@link URI} pointing to the Helm chart contents to load.
+   */
+  @Parameter(required = true, defaultValue = "file:${project.basedir}/src/helm/charts/${project.artifactId}/")
   private URI chartContentsUri;
   
   @Parameter
@@ -264,14 +288,73 @@ public class PackageMojo extends AbstractHelmMojo {
     
   }
 
+  /**
+   * Implements the {@link Disposable} interface by {@linkplain
+   * AbstractChartLoader#close() closing} the {@link
+   * AbstractChartLoader} returned by the {@link #getChartLoader()}
+   * method and {@linkplain AbstractChartWriter#close() closing} the
+   * {@link AbstractChartWriter} returned by the {@link
+   * #getChartWriter()} method.
+   *
+   * <p>Any {@link IOException}s encountered are {@linkplain
+   * Log#error(Throwable) logged}.</p>
+   */
+  @Override
+  public void dispose() {
+    final Log log = this.getLog();
+    assert log != null;
+
+    final Closeable chartLoader = this.getChartLoader();
+    if (chartLoader != null) {
+      try {
+        chartLoader.close();
+      } catch (final IOException logMe) {
+        if (log.isErrorEnabled()) {
+          log.error(logMe);
+        }
+      }
+    }
+
+    final Closeable chartWriter = this.getChartWriter();
+    if (chartWriter != null) {
+      try {
+        chartWriter.close();
+      } catch (final IOException logMe) {
+        if (log.isErrorEnabled()) {
+          log.error(logMe);
+        }
+      }
+    }
+  }
+
+  /**
+   * Returns {@code true} if this {@link PackageMojo} should not
+   * execute.
+   *
+   * @return {@code true} if this {@link PackageMojo} should not
+   * execute; {@code false} otherwise
+   *
+   * @see #setSkip(boolean)
+   */
   public boolean getSkip() {
     return this.skip;
   }
 
+  /**
+   * Controls whether this {@link PackageMojo} should execute.
+   *
+   * @param skip if {@code true}, this {@link PackageMojo} will not
+   * execute
+   *
+   * @see #getSkip()
+   */
   public void setSkip(final boolean skip) {
     this.skip = skip;
   }
 
+  /**
+   *
+   */
   public AbstractChartLoader<URL> getChartLoader() {
     return this.chartLoader;
   }

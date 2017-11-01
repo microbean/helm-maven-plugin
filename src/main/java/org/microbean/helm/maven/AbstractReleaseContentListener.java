@@ -23,19 +23,64 @@ import hapi.services.tiller.Tiller.GetReleaseContentResponseOrBuilder;
 
 import org.apache.maven.plugin.logging.Log;
 
+/**
+ * A {@link ReleaseContentListener} that {@linkplain
+ * Log#info(CharSequence) logs} the {@link
+ * hapi.services.tiller.Tiller.GetReleaseContentResponseOrBuilder}
+ * {@linkplain
+ * ReleaseContentEvent#getReleaseContentResponseOrBuilder() associated
+ * with a <code>ReleaseContentEvent</code>}.
+ *
+ * @author <a href="https://about.me/lairdnelson"
+ * target="_parent">Laird Nelson</a>
+ *
+ * @see ReleaseContentEvent
+ *
+ * @see ReleaseContentListener
+ */
 public class AbstractReleaseContentListener implements ReleaseContentListener {
 
+
+  /*
+   * Constructors.
+   */
+
+  
+  /**
+   * Creates a new {@link AbstractReleaseContentListener}.
+   */
   public AbstractReleaseContentListener() {
     super();
   }
 
+
+  /*
+   * Instance methods.
+   */
+  
+
+  /**
+   * {@linkplain Log#info(CharSequence) Logs} the {@link
+   * hapi.services.tiller.Tiller.GetReleaseContentResponseOrBuilder}
+   * {@linkplain
+   * ReleaseContentEvent#getReleaseContentResponseOrBuilder()
+   * associated with a <code>ReleaseContentEvent</code>}.
+   *
+   * @param event the {@link ReleaseContentEvent} describing the
+   * release content; may be {@code null} in which case no action will
+   * be taken
+   *
+   * @see ReleaseContentEvent
+   *
+   * @see
+   * hapi.services.tiller.Tiller.GetReleaseContentResponseOrBuilder#toString()
+   */
   @Override
   public void releaseContentRetrieved(final ReleaseContentEvent event) {
     if (event != null) {
-      final GetReleaseContentResponseOrBuilder getReleaseContentResponseOrBuilder = event.getReleaseContentResponseOrBuilder();
       final Log log = event.getLog();
       if (log != null && log.isInfoEnabled()) {
-        log.info(String.valueOf(getReleaseContentResponseOrBuilder));
+        log.info(String.valueOf(event.getReleaseContentResponseOrBuilder()));
       }
     }
   }

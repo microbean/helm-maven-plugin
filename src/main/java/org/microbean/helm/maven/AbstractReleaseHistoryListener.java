@@ -23,12 +23,57 @@ import hapi.services.tiller.Tiller.GetHistoryResponseOrBuilder;
 
 import org.apache.maven.plugin.logging.Log;
 
+/**
+ * A {@link ReleaseHistoryListener} that {@linkplain
+ * Log#info(CharSequence) logs} the {@link
+ * hapi.services.tiller.Tiller.GetHistoryResponseOrBuilder}
+ * {@linkplain
+ * ReleaseHistoryEvent#getHistoryResponseOrBuilder() associated
+ * with a <code>ReleaseHistoryEvent</code>}.
+ *
+ * @author <a href="https://about.me/lairdnelson"
+ * target="_parent">Laird Nelson</a>
+ *
+ * @see ReleaseHistoryEvent
+ *
+ * @see ReleaseHistoryListener
+ */
 public class AbstractReleaseHistoryListener implements ReleaseHistoryListener {
 
+
+  /*
+   * Constructors.
+   */
+
+
+  /**
+   * Creates a new {@link AbstractReleaseHistoryListener}.
+   */
   public AbstractReleaseHistoryListener() {
     super();
   }
 
+
+  /*
+   * Instance methods.
+   */
+  
+
+  /**
+   * {@linkplain Log#info(CharSequence) Logs} the {@link
+   * hapi.services.tiller.Tiller.GetHistoryResponseOrBuilder}
+   * {@linkplain ReleaseHistoryEvent#getHistoryResponseOrBuilder()
+   * associated with a <code>ReleaseHistoryEvent</code>}.
+   *
+   * @param event the {@link ReleaseHistoryEvent} describing the
+   * release; may be {@code null} in which case no action will be
+   * taken
+   *
+   * @see ReleaseHistoryEvent
+   *
+   * @see
+   * hapi.services.tiller.Tiller.GetHistoryResponse#toString()
+   */
   @Override
   public void releaseHistoryRetrieved(final ReleaseHistoryEvent event) {
     if (event != null) {

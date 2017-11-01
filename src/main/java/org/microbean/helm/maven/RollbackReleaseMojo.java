@@ -33,6 +33,14 @@ import org.apache.maven.plugins.annotations.Parameter;
 
 import org.microbean.helm.ReleaseManager;
 
+/**
+ * <a
+ * href="https://docs.helm.sh/using_helm/#helm-upgrade-and-helm-rollback-upgrading-a-release-and-recovering-on-failure">Rolls
+ * a release back</a> to a prior version.
+ *
+ * @author <a href="https://about.me/lairdnelson"
+ * target="_parent">Laird Nelson</a>
+ */
 @Mojo(name = "rollback")
 public class RollbackReleaseMojo extends AbstractForceableMutatingReleaseMojo {
 
@@ -41,9 +49,12 @@ public class RollbackReleaseMojo extends AbstractForceableMutatingReleaseMojo {
    * Instance fields.
    */
 
-  
-  @Parameter
-  private int version;
+
+  /**
+   * The version to roll back to.
+   */
+  @Parameter(required = true)
+  private Integer version;
 
 
   /*
@@ -51,6 +62,9 @@ public class RollbackReleaseMojo extends AbstractForceableMutatingReleaseMojo {
    */
   
 
+  /**
+   * Creates a new {@link RollbackReleaseMojo}.
+   */
   public RollbackReleaseMojo() {
     super();
   }
@@ -60,13 +74,26 @@ public class RollbackReleaseMojo extends AbstractForceableMutatingReleaseMojo {
    * Instance methods.
    */
 
-  
+
+  /**
+   * {@inheritDoc}
+   *
+   * <p>This implementation <a
+   * href="https://docs.helm.sh/using_helm/#helm-upgrade-and-helm-rollback-upgrading-a-release-and-recovering-on-failure">rolls
+   * a named release back</a> to a {@linkplain #getVersion() prior
+   * version}.</p>
+   */
   @Override
   protected void execute(final Callable<ReleaseManager> releaseManagerCallable) throws Exception {
     Objects.requireNonNull(releaseManagerCallable);
     final Log log = this.getLog();
     assert log != null;
 
+    final Integer version = this.getVersion();
+    if (version == null) {
+      throw new IllegalStateException("version was not specified");
+    }
+    
     final RollbackReleaseRequest.Builder requestBuilder = RollbackReleaseRequest.newBuilder();
     assert requestBuilder != null;
 
@@ -81,7 +108,7 @@ public class RollbackReleaseMojo extends AbstractForceableMutatingReleaseMojo {
     }
     
     requestBuilder.setTimeout(this.getTimeout());
-    requestBuilder.setVersion(this.getVersion());
+    requestBuilder.setVersion(version.intValue());
     requestBuilder.setWait(this.getWait());
 
     final ReleaseManager releaseManager = releaseManagerCallable.call();
@@ -104,11 +131,35 @@ public class RollbackReleaseMojo extends AbstractForceableMutatingReleaseMojo {
     
   }
 
-  public int getVersion() {
+  /**
+   * Returns the version of the release to roll back to.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * <p>Overrides of this method are permitted to return {@code null}.</p>
+   *
+   * @return the version of the release to roll back to, or {@code
+   * null}
+   *
+   * @see #setVersion(Integer)
+   */
+  public Integer getVersion() {
     return this.version;
   }
 
-  public void setVersion(final int version) {
+  /**
+   * Sets the version of the release to roll back to.
+   *
+   * @param version the version to roll back to; must not be {@code
+   * null}
+   *
+   * @exception NullPointerException if {@code version} is {@code
+   * null}
+   *
+   * @see #getVersion()
+   */
+  public void setVersion(final Integer version) {
+    Objects.requireNonNull(version);
     this.version = version;
   }
 
