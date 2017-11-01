@@ -18,8 +18,29 @@ package org.microbean.helm.maven;
 
 import java.util.EventListener;
 
+/**
+ * An {@link EventListener} that is notified when a <a
+ * href="https://docs.helm.sh/glossary/#release">Helm release</a> has
+ * been {@linkplain TestReleaseMojo tested}.
+ *
+ * @author <a href="https://about.me/lairdnelson"
+ * target="_parent">Laird Nelson</a>
+ *
+ * @see TestReleaseMojo
+ */
 public interface ReleaseTestListener extends EventListener {
 
+  /**
+   * Called when a <a
+   * href="https://docs.helm.sh/glossary/#release">Helm release</a> has
+   * been {@linkplain TestReleaseMojo tested}.
+   *
+   * @param event the {@link ReleaseTestEvent} describing the test
+   *
+   * @see ReleaseTestEvent
+   *
+   * @see TestReleaseMojo
+   */
   public void releaseTested(final ReleaseTestEvent event);
   
 }

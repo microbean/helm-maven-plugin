@@ -18,8 +18,31 @@ package org.microbean.helm.maven;
 
 import java.util.EventListener;
 
+/**
+ * An {@link EventListener} that is notified when the history about a
+ * <a href="https://docs.helm.sh/glossary/#release">Helm release</a>
+ * has been retrieved.
+ *
+ * @author <a href="https://about.me/lairdnelson"
+ * target="_parent">Laird Nelson</a>
+ *
+ * @see ReleaseHistoryEvent
+ *
+ * @see GetReleaseHistoryMojo
+ */
 public interface ReleaseHistoryListener extends EventListener {
 
+  /**
+   * Called when the history of a <a
+   * href="https://docs.helm.sh/glossary/#release">Helm release</a> has
+   * been {@linkplain GetReleaseHistoryMojo retrieved}.
+   *
+   * @param event the {@link ReleaseHistoryEvent} describing the history
+   *
+   * @see ReleaseHistoryEvent
+   *
+   * @see GetReleaseHistoryMojo
+   */
   public void releaseHistoryRetrieved(final ReleaseHistoryEvent event);
   
 }

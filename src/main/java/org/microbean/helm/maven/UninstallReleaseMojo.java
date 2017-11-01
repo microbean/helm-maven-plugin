@@ -33,22 +33,71 @@ import org.apache.maven.plugins.annotations.Parameter;
 
 import org.microbean.helm.ReleaseManager;
 
+/**
+ * Uninstalls a release.
+ *
+ * @author <a href="https://about.me/lairdnelson"
+ * target="_parent">Laird Nelson</a>
+ */
 @Mojo(name = "uninstall")
 public class UninstallReleaseMojo extends AbstractSingleReleaseMojo {
 
-  @Parameter
+
+  /*
+   * Instance fields.
+   */
+
+
+  /**
+   * Whether <a
+   * href="https://github.com/kubernetes/helm/blob/master/docs/charts_hooks.md#hooks">release
+   * hooks</a> should be disabled.
+   */
+  @Parameter(defaultValue = "false")
   private boolean disableHooks;
 
+  /**
+   * The default timeout, in seconds, to use for Kubernetes
+   * operations; set to {@code 300} by default for parity with the
+   * {@code helm} command line program.
+   */
   @Parameter(defaultValue = "300")
   private long timeout; // in seconds
 
-  @Parameter
+  /**
+   * Whether the release being uninstalled should be purged entirely
+   * instead of being marked as deleted.
+   */
+  @Parameter(defaultValue = "false")
   private boolean purge;
-  
+
+
+  /*
+   * Constructors.
+   */
+
+
+  /**
+   * Creates a new {@link UninstallReleaseMojo}.
+   */
   public UninstallReleaseMojo() {
     super();
   }
 
+
+  /*
+   * Instance methods.
+   */
+  
+
+  /**
+   * {@inheritDoc}
+   *
+   * <p>This implementation <a
+   * href="https://docs.helm.sh/using_helm/#helm-delete-deleting-a-release">uninstalls</a>
+   * the release with the {@linkplain #getReleaseName() supplied
+   * release name}.</p>
+   */
   @Override
   protected void execute(final Callable<ReleaseManager> releaseManagerCallable) throws Exception {
     Objects.requireNonNull(releaseManagerCallable);
@@ -88,26 +137,82 @@ public class UninstallReleaseMojo extends AbstractSingleReleaseMojo {
     
   }
 
+  /**
+   * Returns {@code true} if <a
+   * href="https://github.com/kubernetes/helm/blob/master/docs/charts_hooks.md#hooks">chart
+   * hooks</a> are disabled.
+   *
+   * @return {@code true} if <a
+   * href="https://github.com/kubernetes/helm/blob/master/docs/charts_hooks.md#hooks">chart
+   * hooks</a> are disabled
+   *
+   * @see #setDisableHooks(boolean)
+   */
   public boolean getDisableHooks() {
     return this.disableHooks;
   }
 
+  /**
+   * Sets whether <a
+   * href="https://github.com/kubernetes/helm/blob/master/docs/charts_hooks.md#hooks">chart
+   * hooks</a> are disabled.
+   *
+   * @param disableHooks if {@code true}, <a
+   * href="https://github.com/kubernetes/helm/blob/master/docs/charts_hooks.md#hooks">chart
+   * hooks</a> will be disabled
+   *
+   * @see #getDisableHooks()
+   */
   public void setDisableHooks(final boolean disableHooks) {
     this.disableHooks = disableHooks;
   }
 
+  /**
+   * Returns whether the release being uninstalled should be purged entirely
+   * instead of being marked as deleted.
+   *
+   * @return {@code true} if the release being uninstalled should be
+   * purged entirely instead of being marked as deleted; {@code false}
+   * if it should be marked as deleted
+   *
+   * @see #setPurge(boolean)
+   */
   public boolean getPurge() {
     return this.purge;
   }
 
+  /**
+   * Sets whether the release being uninstalled should be purged
+   * entirely instead of being marked as deleted.
+   *
+   * @param purge if {@code true} the release being uninstalled will
+   * be purged entirely
+   *
+   * @see #getPurge()
+   */
   public void setPurge(final boolean purge) {
     this.purge = purge;
   }
-  
+
+  /**
+   * Returns the timeout value, in seconds, for Kubernetes operations.
+   *
+   * @return the timeout value, in seconds, for Kubernetes operations
+   *
+   * @see #setTimeout(long)
+   */
   public long getTimeout() {
     return this.timeout;
   }
 
+  /**
+   * Sets the timeout value, in seconds, for Kubernetes operations.
+   *
+   * @param timeout the timeout value, in seconds, for Kubernetes
+   * operations
+   *
+   * @see #getTimeout()
+   */
   public void setTimeout(final long timeoutInSeconds) {
     this.timeout = timeoutInSeconds;
   }

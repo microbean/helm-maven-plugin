@@ -16,29 +16,94 @@
  */
 package org.microbean.helm.maven;
 
-import java.util.EventObject;
+import java.io.Serializable; // for javadoc only
+
+import java.util.EventObject; // for javadoc only
 import java.util.Objects;
 
 import hapi.services.tiller.Tiller.GetReleaseContentResponseOrBuilder;
 
-import org.apache.maven.plugin.logging.Log;
-
+/**
+ * An {@link AbstractReleaseEvent} describing a retrieval of the
+ * content of a <a href="https://docs.helm.sh/glossary/#release">Helm
+ * release</a>.
+ *
+ * @author <a href="https://about.me/lairdnelson"
+ * target="_parent">Laird Nelson</a>
+ *
+ * @see ReleaseContentListener
+ *
+ * @see GetReleaseContentMojo
+ */
 public class ReleaseContentEvent extends AbstractReleaseEvent {
 
-  private static final long serialVersionUID = 1L;
   
+  /*
+   * Static fields.
+   */
+
+
+  /**
+   * The version of this class for {@linkplain Serializable
+   * serialization} purposes.
+   */
+  private static final long serialVersionUID = 1L;
+    
+
+  /*
+   * Instance fields.
+   */
+
+
+  /**
+   * The {@link
+   * hapi.services.tiller.Tiller.GetReleaseContentResponseOrBuilder}
+   * describing the release content retrieval.
+   *
+   * <p>This field will never be {@code null}.</p>
+   *
+   * @see #ReleaseContentEvent(GetReleaseContentMojo,
+   * hapi.services.tiller.Tiller.GetReleaseContentResponseOrBuilder)
+   */
   private final GetReleaseContentResponseOrBuilder getReleaseContentResponseOrBuilder;
   
-  public ReleaseContentEvent(final GetReleaseContentMojo source, final Log log, final GetReleaseContentResponseOrBuilder getReleaseContentResponseOrBuilder) {
-    super(source, log);
+  public ReleaseContentEvent(final GetReleaseContentMojo source, final GetReleaseContentResponseOrBuilder getReleaseContentResponseOrBuilder) {
+    super(source);
     Objects.requireNonNull(getReleaseContentResponseOrBuilder);
     this.getReleaseContentResponseOrBuilder = getReleaseContentResponseOrBuilder;
   }
 
+  
+  /*
+   * Instance methods.
+   */
+
+
+  /**
+   * Returns the {@link
+   * hapi.services.tiller.Tiller.GetReleaseContentResponseOrBuilder}
+   * implementation representing the release content retrieval.
+   *
+   * <p>This method never returns {@code null}.</p>
+   *
+   * @return the {@link
+   * hapi.services.tiller.Tiller.GetReleaseContentResponseOrBuilder}
+   * implementation representing the release content retrieval; never
+   * {@code null}
+   */
   public final GetReleaseContentResponseOrBuilder getReleaseContentResponseOrBuilder() {
     return this.getReleaseContentResponseOrBuilder;
   }
 
+  /**
+   * Returns the {@link GetReleaseContentMojo} responsible for firing
+   * this event.
+   *
+   * <p>This method never returns {@code null}.</p>
+   *
+   * @return the {@link GetReleaseContentMojo} responsible for firing
+   * this event; never {@code null}
+   */
   @Override
   public final GetReleaseContentMojo getSource() {
     return (GetReleaseContentMojo)super.getSource();
