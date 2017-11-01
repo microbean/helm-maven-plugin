@@ -23,11 +23,58 @@ import hapi.services.tiller.Tiller.TestReleaseResponseOrBuilder;
 
 import org.apache.maven.plugin.logging.Log;
 
+/**
+ * A {@link ReleaseTestListener} that {@linkplain
+ * Log#info(CharSequence) logs} the {@link
+ * hapi.services.tiller.Tiller.TestReleaseResponseOrBuilder}
+ * {@linkplain
+ * ReleaseTestEvent#getTestReleaseResponseOrBuilder() associated
+ * with a <code>ReleaseTestEvent</code>}.
+ *
+ * @author <a href="https://about.me/lairdnelson"
+ * target="_parent">Laird Nelson</a>
+ *
+ * @see ReleaseTestEvent
+ *
+ * @see ReleaseTestListener
+ */
 public class AbstractReleaseTestListener implements ReleaseTestListener {
 
+
+  /*
+   * Constructors.
+   */
+
+  
+  /**
+   * Creates a new {@link AbstractReleaseTestListener}.
+   */
   public AbstractReleaseTestListener() {
     super();
   }
+  
+
+  /*
+   * Instance methods.
+   */
+  
+
+  /**
+   * {@linkplain Log#info(CharSequence) Logs} the {@link
+   * hapi.services.tiller.Tiller.TestReleaseResponseOrBuilder}
+   * {@linkplain
+   * ReleaseTestEvent#getTestReleaseResponseOrBuilder()
+   * associated with a <code>ReleaseTestEvent</code>}.
+   *
+   * @param event the {@link ReleaseTestEvent} describing the
+   * release test; may be {@code null} in which case no action will
+   * be taken
+   *
+   * @see ReleaseTestEvent
+   *
+   * @see
+   * hapi.services.tiller.Tiller.TestReleaseResponse#toString()
+   */
 
   @Override
   public void releaseTested(final ReleaseTestEvent event) {

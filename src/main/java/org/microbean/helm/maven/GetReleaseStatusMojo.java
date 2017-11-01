@@ -68,6 +68,11 @@ public class GetReleaseStatusMojo extends AbstractSingleVersionedReleaseMojo {
     final Log log = this.getLog();
     assert log != null;
 
+    final Integer version = this.getVersion();
+    if (version == null) {
+      throw new IllegalStateException("version was not specified");
+    }
+    
     final Collection<? extends ReleaseStatusListener> listeners = this.getReleaseStatusListenersList();
     if (listeners == null || listeners.isEmpty()) {
       if (log.isInfoEnabled()) {
@@ -84,7 +89,7 @@ public class GetReleaseStatusMojo extends AbstractSingleVersionedReleaseMojo {
       requestBuilder.setName(releaseName);
     }
 
-    requestBuilder.setVersion(this.getVersion());
+    requestBuilder.setVersion(version.intValue());
 
     final ReleaseManager releaseManager = releaseManagerCallable.call();
     if (releaseManager == null) {

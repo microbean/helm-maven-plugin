@@ -73,7 +73,7 @@ public class AbstractReleaseContentListener implements ReleaseContentListener {
    * @see ReleaseContentEvent
    *
    * @see
-   * hapi.services.tiller.Tiller.GetReleaseContentResponseOrBuilder#toString()
+   * hapi.services.tiller.Tiller.GetReleaseContentResponse#toString()
    */
   @Override
   public void releaseContentRetrieved(final ReleaseContentEvent event) {
