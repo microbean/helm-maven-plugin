@@ -13,7 +13,7 @@
     <version>5</version>
   </parent>
 
-  <name>microBean Maven Helm Plugin</name>
+  <name>microBean Helm Maven Plugin</name>
   <description>A Maven plugin for Helm.</description>
   <inceptionYear>2017</inceptionYear>
   <url>https://microbean.github.io/${project.artifactId}</url>
