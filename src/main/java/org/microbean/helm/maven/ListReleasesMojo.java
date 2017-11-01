@@ -40,30 +40,87 @@ import org.apache.maven.plugins.annotations.Parameter;
 
 import org.microbean.helm.ReleaseManager;
 
+/**
+ * Retrieves releases matching certain criteria and notifies
+ * registered listeners.
+ *
+ * @author <a href="https://about.me/lairdnelson"
+ * target="_parent">Laird Nelson</a>
+ */
 @Mojo(name = "list")
 public class ListReleasesMojo extends AbstractReleaseMojo {
 
+
+  /*
+   * Instance fields.
+   */
+
+
+  /**
+   * The regular expression that will be applied to the list of
+   * releases.  Only releases that match the filter will be considered
+   * for listing.
+   */
   @Parameter
   private String filter;
 
+  /**
+   * The maximum number of releases to retrieve.
+   */
   @Parameter(defaultValue = "256")
   private long limit;
-  
+
+  /**
+   * The namespace from which releases will be listed.
+   */
   @Parameter
   private String namespace;
 
+  /**
+   * The next release name in the list; used to offset from the start
+   * value.
+   */
   @Parameter
   private String offset;
 
-  @Parameter
+  /**
+   * A <a
+   * href="https://microbean.github.io/microbean-helm/apidocs/hapi/services/tiller/Tiller.ListSort.SortBy.html">{@code
+   * SortBy}</a> indicating how the results should be sorted.  Useful
+   * values are <a
+   * href="https://microbean.github.io/microbean-helm/apidocs/hapi/services/tiller/Tiller.ListSort.SortBy.html#NAME">{@code
+   * NAME}</a> and <a
+   * href="https://microbean.github.io/microbean-helm/apidocs/hapi/services/tiller/Tiller.ListSort.SortBy.html#LAST_RELEASED">{@code
+   * LAST_RELEASED}</a>.
+   */
+  @Parameter(defaultValue = "NAME")
   private SortBy sortBy;
 
+  /**
+   * A <a
+   * href="https://microbean.github.io/microbean-helm/apidocs/hapi/services/tiller/Tiller.ListSort.SortOrder.html">{@code
+   * SortOrder}</a> indicating whether results should appear sorted in
+   * ascending or descending order.
+   */
   @Parameter
   private SortOrder sortOrder;
 
+  /**
+   * A {@link List} of <a
+   * href="https://microbean.github.io/microbean-helm/apidocs/hapi/release/StatusOuterClass.Status.Code.html">{@code
+   * StatusOuterClass.Status.Code}</a>s.  Releases must have one of
+   * these status codes to be included in the list created by this
+   * goal.
+   */
   @Parameter
   private List<Status.Code> statusCodes;
 
+  /**
+   * A {@link List} of <a
+   * href="apidocs/org/microbean/helm/maven/ReleaseDiscoveryListener.html">{@code
+   * ReleaseDiscoveryListener}</a>s whose elements will be notified of
+   * each release in the list created by this goal.
+   */
   @Parameter(alias = "releaseDiscoveryListenersList")
   private List<ReleaseDiscoveryListener> releaseDiscoveryListeners;
   
@@ -72,7 +129,10 @@ public class ListReleasesMojo extends AbstractReleaseMojo {
    * Constructors.
    */
   
-  
+
+  /**
+   * Creates a new {@link ListReleasesMojo}.
+   */
   public ListReleasesMojo() {
     super();
   }
@@ -83,6 +143,15 @@ public class ListReleasesMojo extends AbstractReleaseMojo {
    */
   
 
+  /**
+   * {@inheritDoc}
+   *
+   * <p>This implementation retrieves information about releases and
+   * {@linkplain
+   * ReleaseDiscoveryListener#releaseDiscovered(ReleaseDiscoveryEvent)
+   * notifies} {@linkplain #getReleaseDiscoveryListenersList()
+   * registered <code>ReleaseDiscoveryListener</code>s}.</p>
+   */
   @Override
   protected void execute(final Callable<ReleaseManager> releaseManagerCallable) throws Exception {
     Objects.requireNonNull(releaseManagerCallable);
@@ -172,63 +241,230 @@ public class ListReleasesMojo extends AbstractReleaseMojo {
    */
 
   
+  /**
+   * Returns the regular expression by which releases will be
+   * filtered.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * <p>Overrides of this method may return {@code null}.</p>
+   *
+   * @return the regular expression by which releases will be
+   * filtered, or {@code null}
+   *
+   * @see #setFilter(String)
+   */
   public String getFilter() {
     return this.filter;
   }
 
+  /**
+   * Sets the regular expression by which releases will be filtered.
+   *
+   * @param filter the regular expression by which releases will be
+   * filtered; may be {@code null}
+   *
+   * @see #getFilter()
+   */
   public void setFilter(final String filter) {
     this.filter = filter;
   }
 
+  /**
+   * Returns the maximum number of releases to retrieve.
+   *
+   * @return the maximum number of releases to retrieve
+   *
+   * @see #setLimit(long)
+   */
   public long getLimit() {
     return this.limit;
   }
 
+  /**
+   * Sets the maximum number of releases to retrieve.
+   *
+   * @param limit the maximum number of releases to retrieve
+   *
+   * @see #getLimit()
+   */
   public void setLimit(final long limit) {
     this.limit = limit;
   }
 
+  /**
+   * Returns the <a
+   * href="https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/">namespace</a>
+   * to which releases that are retrieved must belong.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * <p>Overrides of this method are permitted to return {@code
+   * null}.</p>
+   *
+   * @return the <a
+   * href="https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/">namespace</a>
+   * to which releases that are retrieved must belong, or {@code null}
+   *
+   * @see #setNamespace(String)
+   */
   public String getNamespace() {
     return this.namespace;
   }
 
+  /**
+   * Sets the <a
+   * href="https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/">namespace</a>
+   * to which releases that are retrieved must belong.
+   *
+   * @param namespace the <a
+   * href="https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/">namespace</a>
+   * to which releases that are retrieved must belong; may be {@code
+   * null}
+   *
+   * @see #getNamespace()
+   */
   public void setNamespace(final String namespace) {
     this.validateNamespace(namespace);
     this.namespace = namespace;
   }
 
+  /**
+   * Returns the next release name from which listing should begin.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * <p>Overrides of this method are permitted to return {@code
+   * null}.</p>
+   *
+   * @return the next release name from which listing should begin, or
+   * {@code null}
+   *
+   * @see #setOffset(String)x
+   */
   public String getOffset() {
     return this.offset;
   }
 
+  /**
+   * Sets the next release name from which listing should begin.
+   *
+   * @param offset the next release name from which listing should
+   * begin; may be {@code null}
+   *
+   * @see #getOffset()
+   */
   public void setOffset(final String offset) {
     this.offset = offset;
   }
 
+  /**
+   * Returns a {@link SortBy} indicating how the result list should be
+   * sorted.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * <p>Overrides of this method may return {@code null}.</p>
+   *
+   * @return a {@link SortBy} indicating how the result list should be
+   * sorted, or {@code null}
+   *
+   * @see #setSortBy(Tiller.ListSort.SortBy)
+   */
   public SortBy getSortBy() {
     return this.sortBy;
   }
 
+  /**
+   * Sets the {@link SortBy} indicating how the result list should be
+   * sorted.
+   *
+   * @param sortBy the {@link SortBy} indicating how the result list
+   * should be sorted; may be {@code null}
+   *
+   * @see #getSortBy()
+   */
   public void setSortBy(final SortBy sortBy) {
     this.sortBy = sortBy;
   }
 
+  /**
+   * Returns the {@link SortOrder} describing the order of the sorted
+   * result list.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * <p>Overrides of this method are permitted to return {@code null}.</p>
+   *
+   * @return the {@link SortOrder} describing the order of the sorted
+   * result list, or {@code null}
+   *
+   * @see #setSortOrder(Tiller.ListSort.SortOrder)
+   */
   public SortOrder getSortOrder() {
     return this.sortOrder;
   }
 
+  /**
+   * Sets the {@link SortOrder} describing the order of the sorted
+   * result list.
+   *
+   * @param sortOrder the {@link SortOrder} describing the order of
+   * the sorted result list; may be {@code null}
+   *
+   * @see #getSortOrder()
+   */
   public void setSortOrder(final SortOrder sortOrder) {
     this.sortOrder = sortOrder;
   }
 
+  /**
+   * Returns the {@link List} of {@link Status.Code} instances that
+   * describes the possible status codes a release must have in order
+   * to be considered for further listing.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * <p>Overrides of this method are permitted to return {@code null}.</p>
+   *
+   * @return a {@link List} of {@link Status.Code} instances that
+   * describes the possible status codes a release must have in order
+   * to be considered for further listing, or {@code null}
+   *
+   * @see #setStatusCodes(List)
+   */
   public List<Status.Code> getStatusCodes() {
     return this.statusCodes;
   }
 
+  /**
+   * Sets the {@link List} of {@link Status.Code} instances that
+   * describes the possible status codes a release must have in order
+   * to be considered for further listing.
+   *
+   * @param statusCodes a {@link List} of {@link Status.Code}
+   * instances that describes the possible status codes a release must
+   * have in order to be considered for further listing; may be {@code
+   * null}
+   *
+   * @see #getStatusCodes()
+   */
   public void setStatusCodes(final List<Status.Code> statusCodes) {
     this.statusCodes = statusCodes;
   }
 
+  /**
+   * Adds a {@link ReleaseDiscoveryListener} that will be {@linkplain
+   * ReleaseDiscoveryListener#releaseDiscovered(ReleaseDiscoveryEvent)
+   * notified when a release is retrieved
+   *
+   * @param listener the {@link ReleaseDiscoveryListener} to add; may be
+   * {@code null} in which case no action will be taken
+   *
+   * @see #removeReleaseDiscoveryListener(ReleaseDiscoveryListener)
+   *
+   * @see #getReleaseDiscoveryListenersList()
+   */
   public void addReleaseDiscoveryListener(final ReleaseDiscoveryListener listener) {
     if (listener != null) {
       if (this.releaseDiscoveryListeners == null) {
@@ -238,12 +474,37 @@ public class ListReleasesMojo extends AbstractReleaseMojo {
     }
   }
 
+  /**
+   * Removes a {@link ReleaseDiscoveryListener} from this {@link
+   * GetHistoryMojo}.
+   *
+   * @param listener the {@link ReleaseDiscoveryListener} to remove; may
+   * be {@code null} in which case no action will be taken
+   *
+   * @see #addReleaseDiscoveryListener(ReleaseDiscoveryListener)
+   *
+   * @see #getReleaseDiscoveryListenersList()
+   */
   public void removeReleaseDiscoveryListener(final ReleaseDiscoveryListener listener) {
     if (listener != null && this.releaseDiscoveryListeners != null) {
       this.releaseDiscoveryListeners.remove(listener);
     }
   }
-  
+
+  /**
+   * Invokes the {@link #getReleaseDiscoveryListenersList()} method and
+   * {@linkplain Collection#toArray(Object[]) converts its return
+   * value to an array}.
+   *
+   * <p>This method never returns {@code null}.</p>
+   *
+   * <p>Overrides of this method must not return {@code null}.</p>
+   *
+   * @return a non-{@code null} array of {@link
+   * ReleaseDiscoveryListener}s
+   *
+   * @see #getReleaseDiscoveryListenersList()
+   */
   public ReleaseDiscoveryListener[] getReleaseDiscoveryListeners() {
     final Collection<ReleaseDiscoveryListener> listeners = this.getReleaseDiscoveryListenersList();
     if (listeners == null || listeners.isEmpty()) {
@@ -253,10 +514,48 @@ public class ListReleasesMojo extends AbstractReleaseMojo {
     }
   }
 
+  /**
+   * Returns the {@link List} of {@link ReleaseDiscoveryListener}s whose
+   * elements will be {@linkplain
+   * ReleaseDiscoveryListener#releaseDiscovered(ReleaseDiscoveryEvent)
+   * notified when a release is retrieved.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * <p>Overrides of this method are permitted to return {@code
+   * null}.</p>
+   *
+   * @return a {@link List} of {@link ReleaseDiscoveryListener}s, or
+   * {@code null}
+   *
+   * @see #setReleaseDiscoveryListenersList(List)
+   *
+   * @see #addReleaseDiscoveryListener(ReleaseDiscoveryListener)
+   *
+   * @see #removeReleaseDiscoveryListener(ReleaseDiscoveryListener)
+   */
   public List<ReleaseDiscoveryListener> getReleaseDiscoveryListenersList() {
     return this.releaseDiscoveryListeners;
   }
 
+  /**
+   * Installs the {@link List} of {@link ReleaseDiscoveryListener}s
+   * whose elements will be {@linkplain
+   * ReleaseDiscoveryListener#releaseDiscovered(ReleaseDiscoveryEvent)
+   * notified when a release is retrieved}.
+   *
+   * @param releaseDiscoveryListeners the {@link List} of {@link
+   * ReleaseDiscoveryListener}s whose elements will be {@linkplain
+   * ReleaseDiscoveryListener#releaseDiscovered(ReleaseDiscoveryEvent)
+   * notified when a release is retrieved}; may be {@code
+   * null}
+   *
+   * @see #getReleaseDiscoveryListenersList()
+   *
+   * @see #addReleaseDiscoveryListener(ReleaseDiscoveryListener)
+   *
+   * @see #removeReleaseDiscoveryListener(ReleaseDiscoveryListener)
+   */
   public void setReleaseDiscoveryListenersList(final List<ReleaseDiscoveryListener> releaseDiscoveryListeners) {
     this.releaseDiscoveryListeners = releaseDiscoveryListeners;
   }
