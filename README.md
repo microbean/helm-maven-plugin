@@ -1,7 +1,6 @@
 # helm-maven-plugin
 
 [![Build Status](https://travis-ci.org/microbean/helm-maven-plugin.svg?branch=master)](https://travis-ci.org/microbean/helm-maven-plugin)
-[![Javadocs](https://javadoc.io/badge/org.microbean/helm-maven-plugin.svg)](https://javadoc.io/doc/org.microbean/helm-maven-plugin)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.microbean/helm-maven-plugin/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.microbean/helm-maven-plugin)
 
 A [Maven plugin][maven-plugin] for working with [microbean-helm][], a Java version of [Helm, the Kubernetes package manager][helm].
