@@ -4,7 +4,7 @@
 
   <groupId>org.microbean</groupId>
   <artifactId>helm-maven-plugin</artifactId>
-  <version>2.7.0.1.0.33-SNAPSHOT</version>
+  <version>2.7.0.1.0.33</version>
   <packaging>maven-plugin</packaging>
 
   <parent>
@@ -22,7 +22,7 @@
     <connection>scm:git:git@github.com:microbean/${project.artifactId}.git</connection>
     <developerConnection>scm:git:git@github.com:microbean/${project.artifactId}.git</developerConnection>
     <url>https://github.com/microbean/${project.artifactId}/</url>
-    <tag>HEAD</tag>
+    <tag>v2.7.0.1.0.33</tag>
   </scm>
 
   <dependencyManagement>
