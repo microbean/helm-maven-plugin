@@ -8,7 +8,7 @@
 <div class="sourceContainer">
 <pre><span class="sourceLineNo">001</span>/* -*- mode: Java; c-basic-offset: 2; indent-tabs-mode: nil; coding: utf-8-unix -*-<a name="line.1"></a>
 <span class="sourceLineNo">002</span> *<a name="line.2"></a>
-<span class="sourceLineNo">003</span> * Copyright © 2017 MicroBean.<a name="line.3"></a>
+<span class="sourceLineNo">003</span> * Copyright © 2017-2018 microBean.<a name="line.3"></a>
 <span class="sourceLineNo">004</span> *<a name="line.4"></a>
 <span class="sourceLineNo">005</span> * Licensed under the Apache License, Version 2.0 (the "License");<a name="line.5"></a>
 <span class="sourceLineNo">006</span> * you may not use this file except in compliance with the License.<a name="line.6"></a>
@@ -360,43 +360,40 @@
 <span class="sourceLineNo">352</span>    this.skip = skip;<a name="line.352"></a>
 <span class="sourceLineNo">353</span>  }<a name="line.353"></a>
 <span class="sourceLineNo">354</span><a name="line.354"></a>
-<span class="sourceLineNo">355</span>  /**<a name="line.355"></a>
-<span class="sourceLineNo">356</span>   *<a name="line.356"></a>
-<span class="sourceLineNo">357</span>   */<a name="line.357"></a>
-<span class="sourceLineNo">358</span>  public AbstractChartLoader&lt;URL&gt; getChartLoader() {<a name="line.358"></a>
-<span class="sourceLineNo">359</span>    return this.chartLoader;<a name="line.359"></a>
-<span class="sourceLineNo">360</span>  }<a name="line.360"></a>
-<span class="sourceLineNo">361</span><a name="line.361"></a>
-<span class="sourceLineNo">362</span>  public void setChartLoader(final AbstractChartLoader&lt;URL&gt; chartLoader) {<a name="line.362"></a>
-<span class="sourceLineNo">363</span>    this.chartLoader = chartLoader;<a name="line.363"></a>
-<span class="sourceLineNo">364</span>  }<a name="line.364"></a>
-<span class="sourceLineNo">365</span><a name="line.365"></a>
-<span class="sourceLineNo">366</span>  public AbstractChartWriter getChartWriter() {<a name="line.366"></a>
-<span class="sourceLineNo">367</span>    return this.chartWriter;<a name="line.367"></a>
-<span class="sourceLineNo">368</span>  }<a name="line.368"></a>
-<span class="sourceLineNo">369</span><a name="line.369"></a>
-<span class="sourceLineNo">370</span>  public void setChartWriter(final AbstractChartWriter chartWriter) {<a name="line.370"></a>
-<span class="sourceLineNo">371</span>    this.chartWriter = chartWriter;<a name="line.371"></a>
-<span class="sourceLineNo">372</span>  }<a name="line.372"></a>
-<span class="sourceLineNo">373</span><a name="line.373"></a>
-<span class="sourceLineNo">374</span>  public URI getChartContentsUri() {<a name="line.374"></a>
-<span class="sourceLineNo">375</span>    return this.chartContentsUri;<a name="line.375"></a>
-<span class="sourceLineNo">376</span>  }<a name="line.376"></a>
-<span class="sourceLineNo">377</span><a name="line.377"></a>
-<span class="sourceLineNo">378</span>  public void setChartContentsUri(final URI chartContentsUri) {<a name="line.378"></a>
-<span class="sourceLineNo">379</span>    this.chartContentsUri = chartContentsUri;<a name="line.379"></a>
-<span class="sourceLineNo">380</span>  }<a name="line.380"></a>
-<span class="sourceLineNo">381</span><a name="line.381"></a>
-<span class="sourceLineNo">382</span>  public URI getChartTargetUri() {<a name="line.382"></a>
-<span class="sourceLineNo">383</span>    return this.chartTargetUri;<a name="line.383"></a>
-<span class="sourceLineNo">384</span>  }<a name="line.384"></a>
-<span class="sourceLineNo">385</span><a name="line.385"></a>
-<span class="sourceLineNo">386</span>  public void setChartTargetUri(final URI chartTargetUri) {<a name="line.386"></a>
-<span class="sourceLineNo">387</span>    this.chartTargetUri = chartTargetUri;<a name="line.387"></a>
-<span class="sourceLineNo">388</span>  }<a name="line.388"></a>
-<span class="sourceLineNo">389</span><a name="line.389"></a>
-<span class="sourceLineNo">390</span>  <a name="line.390"></a>
-<span class="sourceLineNo">391</span>}<a name="line.391"></a>
+<span class="sourceLineNo">355</span>  public AbstractChartLoader&lt;URL&gt; getChartLoader() {<a name="line.355"></a>
+<span class="sourceLineNo">356</span>    return this.chartLoader;<a name="line.356"></a>
+<span class="sourceLineNo">357</span>  }<a name="line.357"></a>
+<span class="sourceLineNo">358</span><a name="line.358"></a>
+<span class="sourceLineNo">359</span>  public void setChartLoader(final AbstractChartLoader&lt;URL&gt; chartLoader) {<a name="line.359"></a>
+<span class="sourceLineNo">360</span>    this.chartLoader = chartLoader;<a name="line.360"></a>
+<span class="sourceLineNo">361</span>  }<a name="line.361"></a>
+<span class="sourceLineNo">362</span><a name="line.362"></a>
+<span class="sourceLineNo">363</span>  public AbstractChartWriter getChartWriter() {<a name="line.363"></a>
+<span class="sourceLineNo">364</span>    return this.chartWriter;<a name="line.364"></a>
+<span class="sourceLineNo">365</span>  }<a name="line.365"></a>
+<span class="sourceLineNo">366</span><a name="line.366"></a>
+<span class="sourceLineNo">367</span>  public void setChartWriter(final AbstractChartWriter chartWriter) {<a name="line.367"></a>
+<span class="sourceLineNo">368</span>    this.chartWriter = chartWriter;<a name="line.368"></a>
+<span class="sourceLineNo">369</span>  }<a name="line.369"></a>
+<span class="sourceLineNo">370</span><a name="line.370"></a>
+<span class="sourceLineNo">371</span>  public URI getChartContentsUri() {<a name="line.371"></a>
+<span class="sourceLineNo">372</span>    return this.chartContentsUri;<a name="line.372"></a>
+<span class="sourceLineNo">373</span>  }<a name="line.373"></a>
+<span class="sourceLineNo">374</span><a name="line.374"></a>
+<span class="sourceLineNo">375</span>  public void setChartContentsUri(final URI chartContentsUri) {<a name="line.375"></a>
+<span class="sourceLineNo">376</span>    this.chartContentsUri = chartContentsUri;<a name="line.376"></a>
+<span class="sourceLineNo">377</span>  }<a name="line.377"></a>
+<span class="sourceLineNo">378</span><a name="line.378"></a>
+<span class="sourceLineNo">379</span>  public URI getChartTargetUri() {<a name="line.379"></a>
+<span class="sourceLineNo">380</span>    return this.chartTargetUri;<a name="line.380"></a>
+<span class="sourceLineNo">381</span>  }<a name="line.381"></a>
+<span class="sourceLineNo">382</span><a name="line.382"></a>
+<span class="sourceLineNo">383</span>  public void setChartTargetUri(final URI chartTargetUri) {<a name="line.383"></a>
+<span class="sourceLineNo">384</span>    this.chartTargetUri = chartTargetUri;<a name="line.384"></a>
+<span class="sourceLineNo">385</span>  }<a name="line.385"></a>
+<span class="sourceLineNo">386</span><a name="line.386"></a>
+<span class="sourceLineNo">387</span>  <a name="line.387"></a>
+<span class="sourceLineNo">388</span>}<a name="line.388"></a>
 
 
 
