@@ -1,6 +1,6 @@
 /* -*- mode: Java; c-basic-offset: 2; indent-tabs-mode: nil; coding: utf-8-unix -*-
  *
- * Copyright © 2017 MicroBean.
+ * Copyright © 2017-2018 microBean.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -208,7 +208,7 @@ public class UninstallReleaseMojo extends AbstractSingleReleaseMojo {
   /**
    * Sets the timeout value, in seconds, for Kubernetes operations.
    *
-   * @param timeout the timeout value, in seconds, for Kubernetes
+   * @param timeoutInSeconds the timeout value, in seconds, for Kubernetes
    * operations
    *
    * @see #getTimeout()

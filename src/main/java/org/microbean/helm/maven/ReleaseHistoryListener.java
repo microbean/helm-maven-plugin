@@ -1,6 +1,6 @@
 /* -*- mode: Java; c-basic-offset: 2; indent-tabs-mode: nil; coding: utf-8-unix -*-
  *
- * Copyright © 2017 MicroBean.
+ * Copyright © 2017-2018 microBean.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,20 +28,20 @@ import java.util.EventListener;
  *
  * @see ReleaseHistoryEvent
  *
- * @see GetReleaseHistoryMojo
+ * @see GetHistoryMojo
  */
 public interface ReleaseHistoryListener extends EventListener {
 
   /**
    * Called when the history of a <a
    * href="https://docs.helm.sh/glossary/#release">Helm release</a> has
-   * been {@linkplain GetReleaseHistoryMojo retrieved}.
+   * been {@linkplain GetHistoryMojo retrieved}.
    *
    * @param event the {@link ReleaseHistoryEvent} describing the history
    *
    * @see ReleaseHistoryEvent
    *
-   * @see GetReleaseHistoryMojo
+   * @see GetHistoryMojo
    */
   public void releaseHistoryRetrieved(final ReleaseHistoryEvent event);
   

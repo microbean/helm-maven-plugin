@@ -1,6 +1,6 @@
 /* -*- mode: Java; c-basic-offset: 2; indent-tabs-mode: nil; coding: utf-8-unix -*-
  *
- * Copyright © 2017 MicroBean.
+ * Copyright © 2017-2018 microBean.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -169,7 +169,7 @@ public class GetHistoryMojo extends AbstractSingleReleaseMojo {
   /**
    * Adds a {@link ReleaseHistoryListener} that will be {@linkplain
    * ReleaseHistoryListener#releaseHistoryRetrieved(ReleaseHistoryEvent)
-   * notified when a release history is retrieved
+   * notified} when a release history is retrieved
    *
    * @param listener the {@link ReleaseHistoryListener} to add; may be
    * {@code null} in which case no action will be taken
@@ -231,7 +231,7 @@ public class GetHistoryMojo extends AbstractSingleReleaseMojo {
    * Returns the {@link List} of {@link ReleaseHistoryListener}s whose
    * elements will be {@linkplain
    * ReleaseHistoryListener#releaseHistoryRetrieved(ReleaseHistoryEvent)
-   * notified when a release history is retrieved.
+   * notified} when a release history is retrieved.
    *
    * <p>This method may return {@code null}.</p>
    *

@@ -1,6 +1,6 @@
 /* -*- mode: Java; c-basic-offset: 2; indent-tabs-mode: nil; coding: utf-8-unix -*-
  *
- * Copyright © 2017 MicroBean.
+ * Copyright © 2017-2018 microBean.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -235,7 +235,9 @@ public abstract class AbstractReleaseMojo extends AbstractHelmMojo {
    * DefaultKubernetesClient#DefaultKubernetesClient() no-argument
    * constructor}.</p>
    *
-   * @excepiton IOException if there was a problem creating the client
+   * @return a new, non-{@code null} {@link DefaultKubernetesClient}
+   *
+   * @exception IOException if there was a problem creating the client
    */
   protected DefaultKubernetesClient createClient() throws IOException {
     final DefaultKubernetesClient client;

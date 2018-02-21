@@ -270,7 +270,7 @@
 
     <!-- maven-javadoc-plugin properties; see https://maven.apache.org/plugins/maven-javadoc-plugin/javadoc-mojo.html -->
     <doctitle>&lt;a href="${project.url}" target="_parent"&gt;${project.artifactId}&lt;/a&gt; ${project.version} &lt;a href="https://travis-ci.org/microbean/${project.artifactId}" target="_parent"&gt;&lt;img src="https://travis-ci.org/microbean/${project.artifactId}.svg?branch=master"&gt;&lt;/a&gt; &lt;a href="https://maven-badges.herokuapp.com/maven-central/${project.groupId}/${project.artifactId}" target="_parent"&gt;&lt;img src="https://maven-badges.herokuapp.com/maven-central/${project.groupId}/${project.artifactId}/badge.svg"/&gt;&lt;/a&gt;</doctitle>
-    <links>https://maven.apache.org/components/ref/3.5.0/maven-core/apidocs,https://maven.apache.org/components/ref/3.5.0/maven-model/apidocs,https://maven.apache.org/ref/3.5.0/maven-plugin-api/apidocs/,https://codehaus-plexus.github.io/plexus-containers/plexus-container-default/apidocs/,http://www.grpc.io/grpc-java/javadoc/,https://developers.google.com/protocol-buffers/docs/reference/java/,https://microbean.github.io/microbean-helm/apidocs/</links>
+    <links>https://maven.apache.org/components/ref/3.5.0/maven-core/apidocs,https://maven.apache.org/components/ref/3.5.0/maven-model/apidocs,https://maven.apache.org/ref/3.5.0/maven-plugin-api/apidocs/,https://codehaus-plexus.github.io/plexus-containers/plexus-container-default/apidocs/,https://www.grpc.io/grpc-java/javadoc/,https://developers.google.com/protocol-buffers/docs/reference/java/,https://microbean.github.io/microbean-helm/apidocs/</links>
     
     <!-- maven-release-plugin properties; see http://maven.apache.org/maven-release/maven-release-plugin/perform-mojo.html -->
     <goals>deploy,site-deploy</goals>
@@ -284,9 +284,6 @@
     <plugins>
       <plugin>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <configuration>
-          <doclint>-missing</doclint>
-        </configuration>
       </plugin>
       <plugin>
         <artifactId>maven-plugin-plugin</artifactId>

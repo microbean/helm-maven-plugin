@@ -1,6 +1,6 @@
 /* -*- mode: Java; c-basic-offset: 2; indent-tabs-mode: nil; coding: utf-8-unix -*-
  *
- * Copyright © 2017 MicroBean.
+ * Copyright © 2017-2018 microBean.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,7 +57,7 @@ public class ReleaseHistoryEvent extends AbstractReleaseEvent {
 
   /**
    * The {@link
-   * hapi.services.tiller.Tiller.GetReleaseHistoryResponseOrBuilder}
+   * hapi.services.tiller.Tiller.GetHistoryResponseOrBuilder}
    * describing the history retrieval.
    *
    * <p>This field will never be {@code null}.</p>
@@ -79,8 +79,8 @@ public class ReleaseHistoryEvent extends AbstractReleaseEvent {
    * @param source the {@link GetHistoryMojo} responsible for
    * retrieving the history; must not be {@code null}
    *
-   * @param getReleaseHistoryResponseOrBuilder the {@link
-   * hapi.services.tiller.Tiller.GetReleaseHistoryResponseOrBuilder}
+   * @param getHistoryResponseOrBuilder the {@link
+   * hapi.services.tiller.Tiller.GetHistoryResponseOrBuilder}
    * describing the history retrieval; must not be {@code null}
    *
    * @exception IllegalArgumentException if {@code source} is {@code
@@ -104,13 +104,13 @@ public class ReleaseHistoryEvent extends AbstractReleaseEvent {
 
   /**
    * Returns the {@link
-   * hapi.services.tiller.Tiller.GetReleaseHistoryResponseOrBuilder}
+   * hapi.services.tiller.Tiller.GetHistoryResponseOrBuilder}
    * implementation representing the history retrieval.
    *
    * <p>This method never returns {@code null}.</p>
    *
    * @return the {@link
-   * hapi.services.tiller.Tiller.GetReleaseHistoryResponseOrBuilder}
+   * hapi.services.tiller.Tiller.GetHistoryResponseOrBuilder}
    * implementation representing the history retrieval; never {@code
    * null}
    */

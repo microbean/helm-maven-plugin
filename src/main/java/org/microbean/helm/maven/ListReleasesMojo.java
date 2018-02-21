@@ -1,6 +1,6 @@
 /* -*- mode: Java; c-basic-offset: 2; indent-tabs-mode: nil; coding: utf-8-unix -*-
  *
- * Copyright © 2017 MicroBean.
+ * Copyright © 2017-208 microBean.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -340,7 +340,7 @@ public class ListReleasesMojo extends AbstractReleaseMojo {
    * @return the next release name from which listing should begin, or
    * {@code null}
    *
-   * @see #setOffset(String)x
+   * @see #setOffset(String)
    */
   public String getOffset() {
     return this.offset;
@@ -456,7 +456,7 @@ public class ListReleasesMojo extends AbstractReleaseMojo {
   /**
    * Adds a {@link ReleaseDiscoveryListener} that will be {@linkplain
    * ReleaseDiscoveryListener#releaseDiscovered(ReleaseDiscoveryEvent)
-   * notified when a release is retrieved
+   * notified} when a release is retrieved
    *
    * @param listener the {@link ReleaseDiscoveryListener} to add; may be
    * {@code null} in which case no action will be taken
@@ -518,7 +518,7 @@ public class ListReleasesMojo extends AbstractReleaseMojo {
    * Returns the {@link List} of {@link ReleaseDiscoveryListener}s whose
    * elements will be {@linkplain
    * ReleaseDiscoveryListener#releaseDiscovered(ReleaseDiscoveryEvent)
-   * notified when a release is retrieved.
+   * notified} when a release is retrieved.
    *
    * <p>This method may return {@code null}.</p>
    *

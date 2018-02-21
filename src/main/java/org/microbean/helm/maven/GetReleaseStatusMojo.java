@@ -1,6 +1,6 @@
 /* -*- mode: Java; c-basic-offset: 2; indent-tabs-mode: nil; coding: utf-8-unix -*-
  *
- * Copyright © 2017 MicroBean.
+ * Copyright © 2017-2018 microBean.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -147,7 +147,7 @@ public class GetReleaseStatusMojo extends AbstractSingleVersionedReleaseMojo {
   /**
    * Adds a {@link ReleaseStatusListener} that will be {@linkplain
    * ReleaseStatusListener#releaseStatusRetrieved(ReleaseStatusEvent)
-   * notified when a release version's status is retrieved
+   * notified} when a release version's status is retrieved
    *
    * @param listener the {@link ReleaseStatusListener} to add; may be
    * {@code null} in which case no action will be taken
@@ -209,7 +209,7 @@ public class GetReleaseStatusMojo extends AbstractSingleVersionedReleaseMojo {
    * Returns the {@link List} of {@link ReleaseStatusListener}s whose
    * elements will be {@linkplain
    * ReleaseStatusListener#releaseStatusRetrieved(ReleaseStatusEvent)
-   * notified when a release version's status is retrieved.
+   * notified} when a release version's status is retrieved.
    *
    * <p>This method may return {@code null}.</p>
    *
