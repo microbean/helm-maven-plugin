@@ -117,6 +117,13 @@ public class InstallReleaseMojo extends AbstractMutatingReleaseMojo {
   private boolean reuseReleaseName;
 
   /**
+   * Whether a missing or non-resolvable {@code chartUrl} parameter
+   * will result in skipped execution or an error.
+   */
+  @Parameter(defaultValue = "false")
+  private boolean lenient;
+
+  /**
    * YAML-formatted values to supply at the time of installation.
    */
   @Parameter
@@ -186,80 +193,88 @@ public class InstallReleaseMojo extends AbstractMutatingReleaseMojo {
       assert chartPath != null;
       chartUrl = chartPath.toUri().toURL();
       if (!Files.isDirectory(chartPath)) {
-        throw new MojoExecutionException("Non-existent chartUrl: " + chartUrl);
+        if (this.isLenient()) {
+          if (log.isWarnEnabled()) {
+            log.warn("Non-existent or unresolvable default chartUrl (" + chartUrl + "); skipping execution");
+          }
+          chartUrl = null;
+        } else {
+          throw new MojoExecutionException("Non-existent or unresolvable default chartUrl: " + chartUrl);
+        }
       }
     }
-    assert chartUrl != null;
-    if (log.isDebugEnabled()) {
-      log.debug("chartUrl: " + chartUrl);
-    }
-
-    Chart.Builder chartBuilder = null;
-    try (final AbstractChartLoader<URL> chartLoader = this.createChartLoader()) {
-      if (chartLoader == null) {
-        throw new IllegalStateException("createChartLoader() == null");
-      }
+    
+    if (chartUrl != null) {
       if (log.isDebugEnabled()) {
-        log.debug("chartLoader: " + chartLoader);
-        log.debug("Loading Helm chart from " + chartUrl);
+        log.debug("chartUrl: " + chartUrl);
       }
-      chartBuilder = chartLoader.load(chartUrl);
+      
+      Chart.Builder chartBuilder = null;
+      try (final AbstractChartLoader<URL> chartLoader = this.createChartLoader()) {
+        if (chartLoader == null) {
+          throw new IllegalStateException("createChartLoader() == null");
+        }
+        if (log.isDebugEnabled()) {
+          log.debug("chartLoader: " + chartLoader);
+          log.debug("Loading Helm chart from " + chartUrl);
+        }
+        chartBuilder = chartLoader.load(chartUrl);
+      }
+      
+      if (chartBuilder == null) {
+        throw new IllegalStateException("chartBuilder.load(\"" + chartUrl + "\") == null");
+      }
+      
+      if (log.isInfoEnabled()) {
+        log.info("Loaded Helm chart from " + chartUrl);
+      }
+      
+      final InstallReleaseRequest.Builder requestBuilder = InstallReleaseRequest.newBuilder();
+      assert requestBuilder != null;
+      
+      requestBuilder.setDisableHooks(this.getDisableHooks());
+      requestBuilder.setDryRun(this.getDryRun());
+      
+      final String releaseName = this.getReleaseName();
+      if (releaseName != null) {
+        requestBuilder.setName(releaseName);
+      }
+      
+      final String releaseNamespace = this.getReleaseNamespace();
+      if (releaseNamespace != null) {
+        requestBuilder.setNamespace(releaseNamespace);
+      }
+      
+      requestBuilder.setReuseName(this.getReuseReleaseName());
+      requestBuilder.setTimeout(this.getTimeout());
+      
+      final String valuesYaml = this.getValuesYaml();
+      if (valuesYaml != null && !valuesYaml.isEmpty()) {
+        final hapi.chart.ConfigOuterClass.Config.Builder values = requestBuilder.getValuesBuilder();
+        assert values != null;
+        values.setRaw(valuesYaml);
+      }
+      
+      requestBuilder.setWait(this.getWait());
+      
+      final ReleaseManager releaseManager = releaseManagerCallable.call();
+      if (releaseManager == null) {
+        throw new IllegalStateException("releaseManagerCallable.call() == null");
+      }
+      
+      if (log.isInfoEnabled()) {
+        log.info("Installing release " + requestBuilder.getName());
+      }
+      final Future<InstallReleaseResponse> installReleaseResponseFuture = releaseManager.install(requestBuilder, chartBuilder);
+      assert installReleaseResponseFuture != null;
+      final InstallReleaseResponse installReleaseResponse = installReleaseResponseFuture.get();
+      assert installReleaseResponse != null;
+      if (log.isInfoEnabled()) {
+        final Release release = installReleaseResponse.getRelease();
+        assert release != null;
+        log.info("Installed release " + release.getName());
+      }
     }
-
-    if (chartBuilder == null) {
-      throw new IllegalStateException("chartBuilder.load(\"" + chartUrl + "\") == null");
-    }
-
-    if (log.isInfoEnabled()) {
-      log.info("Loaded Helm chart from " + chartUrl);
-    }
-    
-    final InstallReleaseRequest.Builder requestBuilder = InstallReleaseRequest.newBuilder();
-    assert requestBuilder != null;
-
-    requestBuilder.setDisableHooks(this.getDisableHooks());
-    requestBuilder.setDryRun(this.getDryRun());
-
-    final String releaseName = this.getReleaseName();
-    if (releaseName != null) {
-      requestBuilder.setName(releaseName);
-    }
-
-    final String releaseNamespace = this.getReleaseNamespace();
-    if (releaseNamespace != null) {
-      requestBuilder.setNamespace(releaseNamespace);
-    }
-    
-    requestBuilder.setReuseName(this.getReuseReleaseName());
-    requestBuilder.setTimeout(this.getTimeout());
-
-    final String valuesYaml = this.getValuesYaml();
-    if (valuesYaml != null && !valuesYaml.isEmpty()) {
-      final hapi.chart.ConfigOuterClass.Config.Builder values = requestBuilder.getValuesBuilder();
-      assert values != null;
-      values.setRaw(valuesYaml);
-    }
-
-    requestBuilder.setWait(this.getWait());
-
-    final ReleaseManager releaseManager = releaseManagerCallable.call();
-    if (releaseManager == null) {
-      throw new IllegalStateException("releaseManagerCallable.call() == null");
-    }
-
-    if (log.isInfoEnabled()) {
-      log.info("Installing release " + requestBuilder.getName());
-    }
-    final Future<InstallReleaseResponse> installReleaseResponseFuture = releaseManager.install(requestBuilder, chartBuilder);
-    assert installReleaseResponseFuture != null;
-    final InstallReleaseResponse installReleaseResponse = installReleaseResponseFuture.get();
-    assert installReleaseResponse != null;
-    if (log.isInfoEnabled()) {
-      final Release release = installReleaseResponse.getRelease();
-      assert release != null;
-      log.info("Installed release " + release.getName());
-    }
-    
   }
 
   /**
@@ -307,6 +322,37 @@ public class InstallReleaseMojo extends AbstractMutatingReleaseMojo {
     this.chartUrl = chartUrl;
   }
 
+  /**
+   * Returns {@code true} if this {@link InstallReleaseMojo} is
+   * <em>lenient</em>; if {@code true}, a missing or unresolvable
+   * {@link #getChartUrl() chartUrl} parameter will result in
+   * execution being skipped rather than a {@link
+   * MojoExecutionException} being thrown.
+   *
+   * @return {@code true} if this {@link InstallReleaseMojo} is
+   * <em>lenient</em>; {@code false} otherwise
+   */
+  public boolean isLenient() {
+    return this.lenient;
+  }
+
+  /**
+   * Sets whether this {@link InstallReleaseMojo} is <em>lenient</em>;
+   * if {@code true} is supplied, a missing or unresolvable {@link
+   * #getChartUrl() chartUrl} parameter will result in execution being
+   * skipped rather than a {@link MojoExecutionException} being
+   * thrown.
+   *
+   * @param lenient whether this {@link InstallReleaseMojo} is
+   * <em>lenient</em>; if {@code true}, a missing or unresolvable
+   * {@link #getChartUrl() chartUrl} parameter will result in
+   * execution being skipped rather than a {@link
+   * MojoExecutionException} being thrown
+   */
+  public void setLenient(final boolean lenient) {
+    this.lenient = lenient;
+  }
+  
   /**
    * Returns the <a
    * href="https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/">namespace</a>
