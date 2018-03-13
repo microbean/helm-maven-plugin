@@ -65,9 +65,9 @@ public abstract class AbstractReleaseMojo extends AbstractHelmMojo {
 
   /**
    * The <a
-   * href="https://static.javadoc.io/io.fabric8/kubernetes-client/3.0.0/io/fabric8/kubernetes/client/Config.html">{@code
+   * href="https://static.javadoc.io/io.fabric8/kubernetes-client/3.1.8/io/fabric8/kubernetes/client/Config.html">{@code
    * Config}</a> describing how a <a
-   * href="https://static.javadoc.io/io.fabric8/kubernetes-client/3.0.0/io/fabric8/kubernetes/client/DefaultKubernetesClient.html">{@code
+   * href="https://static.javadoc.io/io.fabric8/kubernetes-client/3.1.8/io/fabric8/kubernetes/client/DefaultKubernetesClient.html">{@code
    * DefaultKubernetesClient}</a> should connect to a Kubernetes
    * cluster.
    */
