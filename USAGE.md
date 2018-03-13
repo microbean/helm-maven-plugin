@@ -47,7 +47,7 @@ the [`generate-sources` lifecycle phase][lifecycles] as follows:
     <plugin>
       <groupId>org.microbean</groupId>
       <artifactId>helm-maven-plugin</artifactId>
-      <version>2.7.2.1.0.1</version>
+      <version>2.8.2.1.0.3</version>
       <executions>
         <execution>
           <id>Package your-project chart</id>
@@ -70,7 +70,7 @@ Here is the same stanza, explicitly configured this time:
     <plugin>
       <groupId>org.microbean</groupId>
       <artifactId>helm-maven-plugin</artifactId>
-      <version>2.7.2.1.0.1</version>
+      <version>2.8.2.1.0.3</version>
       <executions>
         <execution>
           <id>Package your-project chart</id>
@@ -115,7 +115,7 @@ using
     <plugin>
       <groupId>org.microbean</groupId>
       <artifactId>helm-maven-plugin</artifactId>
-      <version>2.7.2.1.0.1</version>
+      <version>2.8.2.1.0.3</version>
       <executions>
         <execution>
           <id>Install your-project chart</id>
@@ -148,7 +148,7 @@ hypothetical `frobnicationInterval` setting:
     <plugin>
       <groupId>org.microbean</groupId>
       <artifactId>helm-maven-plugin</artifactId>
-      <version>2.7.2.1.0.1</version>
+      <version>2.8.2.1.0.3</version>
       <executions>
         <execution>
           <id>Install your-project chart</id>
@@ -186,7 +186,7 @@ could do more interesting things:
     <plugin>
       <groupId>org.microbean</groupId>
       <artifactId>helm-maven-plugin</artifactId>
-      <version>2.7.2.1.0.1</version>
+      <version>2.8.2.1.0.3</version>
       <executions>
         <execution>
           <id>List the contents of your-first-release</id>
@@ -219,7 +219,7 @@ release using the `uninstall` goal][uninstall]:
     <plugin>
       <groupId>org.microbean</groupId>
       <artifactId>helm-maven-plugin</artifactId>
-      <version>2.7.2.1.0.1</version>
+      <version>2.8.2.1.0.3</version>
       <executions>
         <execution>
           <id>Uninstall your-first-release</id>

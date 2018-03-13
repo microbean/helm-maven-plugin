@@ -40,7 +40,7 @@ public abstract class AbstractSingleVersionedReleaseMojo extends AbstractSingleR
   /**
    * The version of the release.
    */
-  @Parameter(required = true)
+  @Parameter(required = true, defaultValue = "0")
   private Integer version;
 
 
