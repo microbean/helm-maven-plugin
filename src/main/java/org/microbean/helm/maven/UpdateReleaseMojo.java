@@ -16,9 +16,15 @@
  */
 package org.microbean.helm.maven;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 
+import java.net.URI;
 import java.net.URL;
+
+import java.nio.charset.StandardCharsets;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -95,14 +101,14 @@ public class UpdateReleaseMojo extends AbstractForceableMutatingReleaseMojo {
    * <code>file:/${project.build.directory}/generated-sources/helm/charts/${project.artifactId}</code>
    * will be used instead.
    */
-  @Parameter
+  @Parameter(property = "helm.update.chartUrl")
   private URL chartUrl;
 
   /**
    * Whether values should be reset to the values built in to the
    * chart.  Ignored if {@codde reuseValues} is {@code true}.
    */
-  @Parameter(defaultValue = "false")
+  @Parameter(defaultValue = "false", property = "helm.update.resetValues")
   private boolean resetValues;
 
   /**
@@ -111,16 +117,31 @@ public class UpdateReleaseMojo extends AbstractForceableMutatingReleaseMojo {
    * valuesYaml} parameter.  Ignored if {@code resetValues} is {@code
    * true}.
    */
-  @Parameter
+  @Parameter(property = "helm.update.reuseValues")
   private boolean reuseValues;
 
   /**
    * New values in YAML format to use when updating the release.  May
    * be combined with the effects of the {@code resetValues} and
    * {@code reuseValues} parameters.
+   *
+   * If this parameter and the {@code valuesYamlUri} parameter are
+   * both specified, this parameter is preferred if its value is
+   * non-{@code null} and non-empty.
    */
-  @Parameter
+  @Parameter(property = "helm.update.valuesYaml")
   private String valuesYaml;
+
+  /**
+   * A URI identifying a document containing YAML-formatted values to
+   * supply at the time of updating the release.
+   *
+   * If this parameter and the {@code valuesYaml} parameter are both
+   * specified, this parameter is ignored if the value of the {@code
+   * valuesYaml} parameter is non-{@code null} and non-empty.
+   */
+  @Parameter(property = "helm.update.valuesYamlUri")
+  private URI valuesYamlUri;
   
   
   /*
@@ -222,7 +243,23 @@ public class UpdateReleaseMojo extends AbstractForceableMutatingReleaseMojo {
     requestBuilder.setReuseValues(this.getReuseValues());
     requestBuilder.setTimeout(this.getTimeout());
 
-    final String valuesYaml = this.getValuesYaml();
+    String valuesYaml = this.getValuesYaml();
+    if (valuesYaml == null || valuesYaml.isEmpty()) {
+      final URI valuesYamlUri = this.getValuesYamlUri();
+      if (valuesYamlUri != null) {
+        final URL yamlUrl = valuesYamlUri.toURL();
+        assert yamlUrl != null;
+        try (final Reader reader = new BufferedReader(new InputStreamReader(yamlUrl.openStream(), StandardCharsets.UTF_8))) {
+          final StringBuilder sb = new StringBuilder();
+          final char[] buffer = new char[4096];
+          int charsRead = -1;
+          while ((charsRead = reader.read(buffer, 0, buffer.length)) >= 0) {
+            sb.append(buffer, 0, charsRead);
+          }
+          valuesYaml = sb.toString();
+        }
+      }
+    }
     if (valuesYaml != null && !valuesYaml.isEmpty()) {
       final hapi.chart.ConfigOuterClass.Config.Builder values = requestBuilder.getValuesBuilder();
       assert values != null;
@@ -367,6 +404,37 @@ public class UpdateReleaseMojo extends AbstractForceableMutatingReleaseMojo {
    */
   public void setValuesYaml(final String valuesYaml) {
     this.valuesYaml = valuesYaml;
+  }
+
+  /**
+   * Returns a {@link URI} identifying a YAML document containing the
+   * values to use to customize the installation.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * <p>Overrides of this method may return {@code null}.</p>
+   *
+   * @return a {@link URI} identifying a YAML document containing the
+   * values to use to customize the installation, or {@code null}
+   *
+   * @see #setValuesYamlUri(URI)
+   */
+  public URI getValuesYamlUri() {
+    return this.valuesYamlUri;
+  }
+
+  /**
+   * Sets the {@link URI} identifying a YAML document containing the
+   * values to use to customize the installation.
+   *
+   * @param valuesYamlUri the {@link URI} identifying a YAML document
+   * containing the values to use to customize the installation; may
+   * be {@code null}
+   *
+   * @see #getValuesYamlUri()
+   */
+  public void setValuesYamlUri(final URI valuesYamlUri) {
+    this.valuesYamlUri = valuesYamlUri;
   }
 
   /**

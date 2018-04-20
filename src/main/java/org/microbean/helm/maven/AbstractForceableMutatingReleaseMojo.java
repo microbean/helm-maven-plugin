@@ -39,13 +39,13 @@ public abstract class AbstractForceableMutatingReleaseMojo extends AbstractMutat
   /**
    * Whether the operation should be forced.
    */
-  @Parameter(defaultValue = "false")
+  @Parameter(defaultValue = "false", property = "helm.force")
   private boolean force;
 
   /**
    * Whether Pods should be recreated as part of the operation.
    */
-  @Parameter(defaultValue = "false")
+  @Parameter(defaultValue = "false", property = "helm.recreate")
   private boolean recreate;
 
 

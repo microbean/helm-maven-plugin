@@ -60,7 +60,7 @@ public abstract class AbstractReleaseMojo extends AbstractHelmMojo {
   /**
    * Whether to skip execution.
    */
-  @Parameter(defaultValue = "false")
+  @Parameter(defaultValue = "false", property = "helm.skip")
   private boolean skip;
 
   /**
