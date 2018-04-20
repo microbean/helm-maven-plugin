@@ -16,9 +16,15 @@
  */
 package org.microbean.helm.maven;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 
+import java.net.URI;
 import java.net.URL;
+
+import java.nio.charset.StandardCharsets;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -125,16 +131,34 @@ public class InstallReleaseMojo extends AbstractMutatingReleaseMojo {
 
   /**
    * YAML-formatted values to supply at the time of installation.
+   *
+   * If this parameter and the {@code valuesYamlUri} parameter are
+   * both specified, this parameter is preferred if its value is
+   * non-{@code null} and non-empty.
    */
-  @Parameter
+  @Parameter(property = "helm.install.valuesYaml")
   private String valuesYaml;
 
+  /**
+   * A URI identifying a document containing YAML-formatted values to
+   * supply at the time of installation.
+   *
+   * If this parameter and the {@code valuesYaml} parameter are both
+   * specified, this parameter is ignored if the value of the {@code
+   * valuesYaml} parameter is non-{@code null} and non-empty.
+   */
+  @Parameter(property = "helm.install.valuesYamlUri")
+  private URI valuesYamlUri;
+  
   /**
    * A {@link URL} representing the chart to install.  If omitted,
    * <code>file:/${project.build.directory}/generated-sources/helm/charts/${project.artifactId}</code>
    * will be used instead.
    */
-  @Parameter(required = true, defaultValue = "file:${project.build.directory}/generated-sources/helm/charts/${project.artifactId}")
+  @Parameter(required = true,
+             defaultValue = "file:${project.build.directory}/generated-sources/helm/charts/${project.artifactId}",
+             property = "helm.install.chartUrl"
+  )
   private URL chartUrl;
 
   
@@ -247,8 +271,24 @@ public class InstallReleaseMojo extends AbstractMutatingReleaseMojo {
       
       requestBuilder.setReuseName(this.getReuseReleaseName());
       requestBuilder.setTimeout(this.getTimeout());
-      
-      final String valuesYaml = this.getValuesYaml();
+
+      String valuesYaml = this.getValuesYaml();
+      if (valuesYaml == null || valuesYaml.isEmpty()) {
+        final URI valuesYamlUri = this.getValuesYamlUri();
+        if (valuesYamlUri != null) {
+          final URL yamlUrl = valuesYamlUri.toURL();
+          assert yamlUrl != null;
+          try (final Reader reader = new BufferedReader(new InputStreamReader(yamlUrl.openStream(), StandardCharsets.UTF_8))) {
+            final StringBuilder sb = new StringBuilder();
+            final char[] buffer = new char[4096];
+            int charsRead = -1;
+            while ((charsRead = reader.read(buffer, 0, buffer.length)) >= 0) {
+              sb.append(buffer, 0, charsRead);
+            }
+            valuesYaml = sb.toString();
+          }
+        }
+      }
       if (valuesYaml != null && !valuesYaml.isEmpty()) {
         final hapi.chart.ConfigOuterClass.Config.Builder values = requestBuilder.getValuesBuilder();
         assert values != null;
@@ -442,6 +482,37 @@ public class InstallReleaseMojo extends AbstractMutatingReleaseMojo {
     this.valuesYaml = valuesYaml;
   }
 
+  /**
+   * Returns a {@link URI} identifying a YAML document containing the
+   * values to use to customize the installation.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * <p>Overrides of this method may return {@code null}.</p>
+   *
+   * @return a {@link URI} identifying a YAML document containing the
+   * values to use to customize the installation, or {@code null}
+   *
+   * @see #setValuesYamlUri(URI)
+   */
+  public URI getValuesYamlUri() {
+    return this.valuesYamlUri;
+  }
+
+  /**
+   * Sets the {@link URI} identifying a YAML document containing the
+   * values to use to customize the installation.
+   *
+   * @param valuesYamlUri the {@link URI} identifying a YAML document
+   * containing the values to use to customize the installation; may
+   * be {@code null}
+   *
+   * @see #getValuesYamlUri()
+   */
+  public void setValuesYamlUri(final URI valuesYamlUri) {
+    this.valuesYamlUri = valuesYamlUri;
+  }
+  
   /**
    * {@inheritDoc}
    *

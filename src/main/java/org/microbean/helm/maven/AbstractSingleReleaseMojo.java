@@ -40,7 +40,7 @@ public abstract class AbstractSingleReleaseMojo extends AbstractReleaseMojo {
   /**
    * The name of the release.
    */
-  @Parameter(required = true)
+  @Parameter(required = true, property = "helm.releaseName")
   private String releaseName;
 
 

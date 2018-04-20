@@ -51,7 +51,7 @@ public abstract class AbstractMutatingReleaseMojo extends AbstractSingleReleaseM
    * Whether the operation should be treated as a <em>dry
    * run</em>&mdash;a simulation of a real operation.
    */
-  @Parameter(defaultValue = "false")
+  @Parameter(defaultValue = "false", property = "helm.dryRun")
   private boolean dryRun;
 
   /**
@@ -59,7 +59,7 @@ public abstract class AbstractMutatingReleaseMojo extends AbstractSingleReleaseM
    * {@code 300} by default for parity with the {@code helm} command
    * line program.
    */
-  @Parameter(defaultValue = "300")
+  @Parameter(defaultValue = "300", property = "helm.timeout")
   private long timeout; // in seconds
 
   /**
