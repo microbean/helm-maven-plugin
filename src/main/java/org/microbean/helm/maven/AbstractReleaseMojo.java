@@ -18,6 +18,7 @@ package org.microbean.helm.maven;
 
 import java.io.IOException;
 
+import java.util.Map;
 import java.util.Objects;
 
 import java.util.concurrent.Callable;
@@ -74,7 +75,25 @@ public abstract class AbstractReleaseMojo extends AbstractHelmMojo {
   @Parameter
   private Config clientConfiguration;
 
+  /**
+   * The Kubernetes cluster namespace in which Tiller may be found.
+   */
+  @Parameter(defaultValue = "kube-system", property = "tiller.namespace")
+  private String tillerNamespace;
+  
+  /**
+   * The port on which Tiller may be reached.
+   */
+  @Parameter(defaultValue = "44134", property = "tiller.port")
+  private int tillerPort;
 
+  /**
+   * The Kubernetes labels normally found on Tiller pods.
+   */
+  @Parameter(property = "tiller.labels")
+  private Map<String, String> tillerLabels;
+
+  
   /*
    * Constructors.
    */
@@ -174,7 +193,7 @@ public abstract class AbstractReleaseMojo extends AbstractHelmMojo {
    */
   public void setClientConfiguration(final Config config) {
     this.clientConfiguration = config;
-  }
+  }  
 
   /**
    * Returns {@code true} if this {@link AbstractReleaseMojo} should
@@ -199,6 +218,75 @@ public abstract class AbstractReleaseMojo extends AbstractHelmMojo {
    */
   public void setSkip(final boolean skip) {
     this.skip = skip;
+  }
+
+  /**
+   * Returns the Kubernetes namespace in which Tiller may be found.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * @return the Kubernetes namespace in which Tiller may be found, or
+   * {@code null}
+   */
+  public String getTillerNamespace() {
+    return this.tillerNamespace;
+  }
+
+  /**
+   * Sets the Kubernetes namespace in which Tiller may be found.
+   *
+   * @param tillerNamespace the Kubernetes namespace in which Tiller
+   * may be found; may be {@code null} in which case {@code
+   * kube-system} will be used by the {@link
+   * #createTiller(DefaultKubernetesClient)} method instead
+   */
+  public void setTillerNamespace(String tillerNamespace) {
+    this.tillerNamespace = tillerNamespace;
+  }
+
+  /**
+   * Returns the port on which Tiller may be found.
+   *
+   * @return the port on which Tiller may be found; normally {@code
+   * 44134}
+   */
+  public int getTillerPort() {
+    return this.tillerPort;
+  }
+
+  /**
+   * Sets the port on which Tiller may be found.
+   *
+   * @param tillerPort the port on which Tiller may be found; normally
+   * {@code 44134}
+   */
+  public void setTillerPort(final int tillerPort) {
+    this.tillerPort = tillerPort;
+  }
+
+  /**
+   * Returns the Kubernetes labels that Tiller Pods have.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * @return the Kubernetes labels that Tiller Pods have, or {@code
+   * null}
+   */
+  public Map<String, String> getTillerLabels() {
+    return this.tillerLabels;
+  }
+
+  /**
+   * Sets the Kubernetes labels that Tiller Pods have.
+   *
+   * <p>Tiller Pods are normally labeled with {@code app = helm} and
+   * {@code name = tiller}.</p>
+   *
+   * @param tillerLabels a {@link Map} containing the labels; may be
+   * {@code null}
+   */
+  public void setTillerLabels(final Map<String, String> tillerLabels) {
+    this.tillerLabels = tillerLabels;
   }
 
 
@@ -274,7 +362,7 @@ public abstract class AbstractReleaseMojo extends AbstractHelmMojo {
    */
   protected Tiller createTiller(final DefaultKubernetesClient client) throws IOException {
     Objects.requireNonNull(client);
-    return new Tiller(client);
+    return new Tiller(client, this.getTillerNamespace(), this.getTillerPort(), this.getTillerLabels());
   }
 
   /**
