@@ -26,405 +26,493 @@
 <span class="sourceLineNo">018</span><a name="line.18"></a>
 <span class="sourceLineNo">019</span>import java.io.IOException;<a name="line.19"></a>
 <span class="sourceLineNo">020</span><a name="line.20"></a>
-<span class="sourceLineNo">021</span>import java.util.Objects;<a name="line.21"></a>
-<span class="sourceLineNo">022</span><a name="line.22"></a>
-<span class="sourceLineNo">023</span>import java.util.concurrent.Callable;<a name="line.23"></a>
-<span class="sourceLineNo">024</span><a name="line.24"></a>
-<span class="sourceLineNo">025</span>import java.util.regex.Matcher;<a name="line.25"></a>
-<span class="sourceLineNo">026</span><a name="line.26"></a>
-<span class="sourceLineNo">027</span>import io.fabric8.kubernetes.client.Config;<a name="line.27"></a>
-<span class="sourceLineNo">028</span>import io.fabric8.kubernetes.client.DefaultKubernetesClient;<a name="line.28"></a>
-<span class="sourceLineNo">029</span><a name="line.29"></a>
-<span class="sourceLineNo">030</span>import org.apache.maven.plugin.MojoExecutionException;<a name="line.30"></a>
-<span class="sourceLineNo">031</span>import org.apache.maven.plugin.MojoFailureException;<a name="line.31"></a>
-<span class="sourceLineNo">032</span><a name="line.32"></a>
-<span class="sourceLineNo">033</span>import org.apache.maven.plugin.logging.Log;<a name="line.33"></a>
-<span class="sourceLineNo">034</span><a name="line.34"></a>
-<span class="sourceLineNo">035</span>import org.apache.maven.plugins.annotations.Parameter;<a name="line.35"></a>
-<span class="sourceLineNo">036</span><a name="line.36"></a>
-<span class="sourceLineNo">037</span>import org.microbean.helm.ReleaseManager;<a name="line.37"></a>
-<span class="sourceLineNo">038</span>import org.microbean.helm.Tiller;<a name="line.38"></a>
-<span class="sourceLineNo">039</span><a name="line.39"></a>
-<span class="sourceLineNo">040</span>/**<a name="line.40"></a>
-<span class="sourceLineNo">041</span> * An {@link AbstractHelmMojo} that provides other &lt;a<a name="line.41"></a>
-<span class="sourceLineNo">042</span> * href="https://microbean.github.io/microbean-helm/"&gt;Helm&lt;/a&gt;-related<a name="line.42"></a>
-<span class="sourceLineNo">043</span> * &lt;a<a name="line.43"></a>
-<span class="sourceLineNo">044</span> * href="https://maven.apache.org/developers/mojo-api-specification.html"&gt;mojo&lt;/a&gt;<a name="line.44"></a>
-<span class="sourceLineNo">045</span> * implementations the ability to work with a {@link ReleaseManager}.<a name="line.45"></a>
-<span class="sourceLineNo">046</span> *<a name="line.46"></a>
-<span class="sourceLineNo">047</span> * @author &lt;a href="https://about.me/lairdnelson"<a name="line.47"></a>
-<span class="sourceLineNo">048</span> * target="_parent"&gt;Laird Nelson&lt;/a&gt;<a name="line.48"></a>
-<span class="sourceLineNo">049</span> *<a name="line.49"></a>
-<span class="sourceLineNo">050</span> * @see #execute(Callable)<a name="line.50"></a>
-<span class="sourceLineNo">051</span> */<a name="line.51"></a>
-<span class="sourceLineNo">052</span>public abstract class AbstractReleaseMojo extends AbstractHelmMojo {<a name="line.52"></a>
-<span class="sourceLineNo">053</span><a name="line.53"></a>
+<span class="sourceLineNo">021</span>import java.util.Map;<a name="line.21"></a>
+<span class="sourceLineNo">022</span>import java.util.Objects;<a name="line.22"></a>
+<span class="sourceLineNo">023</span><a name="line.23"></a>
+<span class="sourceLineNo">024</span>import java.util.concurrent.Callable;<a name="line.24"></a>
+<span class="sourceLineNo">025</span><a name="line.25"></a>
+<span class="sourceLineNo">026</span>import java.util.regex.Matcher;<a name="line.26"></a>
+<span class="sourceLineNo">027</span><a name="line.27"></a>
+<span class="sourceLineNo">028</span>import io.fabric8.kubernetes.client.Config;<a name="line.28"></a>
+<span class="sourceLineNo">029</span>import io.fabric8.kubernetes.client.DefaultKubernetesClient;<a name="line.29"></a>
+<span class="sourceLineNo">030</span><a name="line.30"></a>
+<span class="sourceLineNo">031</span>import org.apache.maven.plugin.MojoExecutionException;<a name="line.31"></a>
+<span class="sourceLineNo">032</span>import org.apache.maven.plugin.MojoFailureException;<a name="line.32"></a>
+<span class="sourceLineNo">033</span><a name="line.33"></a>
+<span class="sourceLineNo">034</span>import org.apache.maven.plugin.logging.Log;<a name="line.34"></a>
+<span class="sourceLineNo">035</span><a name="line.35"></a>
+<span class="sourceLineNo">036</span>import org.apache.maven.plugins.annotations.Parameter;<a name="line.36"></a>
+<span class="sourceLineNo">037</span><a name="line.37"></a>
+<span class="sourceLineNo">038</span>import org.microbean.helm.ReleaseManager;<a name="line.38"></a>
+<span class="sourceLineNo">039</span>import org.microbean.helm.Tiller;<a name="line.39"></a>
+<span class="sourceLineNo">040</span><a name="line.40"></a>
+<span class="sourceLineNo">041</span>/**<a name="line.41"></a>
+<span class="sourceLineNo">042</span> * An {@link AbstractHelmMojo} that provides other &lt;a<a name="line.42"></a>
+<span class="sourceLineNo">043</span> * href="https://microbean.github.io/microbean-helm/"&gt;Helm&lt;/a&gt;-related<a name="line.43"></a>
+<span class="sourceLineNo">044</span> * &lt;a<a name="line.44"></a>
+<span class="sourceLineNo">045</span> * href="https://maven.apache.org/developers/mojo-api-specification.html"&gt;mojo&lt;/a&gt;<a name="line.45"></a>
+<span class="sourceLineNo">046</span> * implementations the ability to work with a {@link ReleaseManager}.<a name="line.46"></a>
+<span class="sourceLineNo">047</span> *<a name="line.47"></a>
+<span class="sourceLineNo">048</span> * @author &lt;a href="https://about.me/lairdnelson"<a name="line.48"></a>
+<span class="sourceLineNo">049</span> * target="_parent"&gt;Laird Nelson&lt;/a&gt;<a name="line.49"></a>
+<span class="sourceLineNo">050</span> *<a name="line.50"></a>
+<span class="sourceLineNo">051</span> * @see #execute(Callable)<a name="line.51"></a>
+<span class="sourceLineNo">052</span> */<a name="line.52"></a>
+<span class="sourceLineNo">053</span>public abstract class AbstractReleaseMojo extends AbstractHelmMojo {<a name="line.53"></a>
 <span class="sourceLineNo">054</span><a name="line.54"></a>
-<span class="sourceLineNo">055</span>  /*<a name="line.55"></a>
-<span class="sourceLineNo">056</span>   * Instance fields.<a name="line.56"></a>
-<span class="sourceLineNo">057</span>   */<a name="line.57"></a>
-<span class="sourceLineNo">058</span><a name="line.58"></a>
+<span class="sourceLineNo">055</span><a name="line.55"></a>
+<span class="sourceLineNo">056</span>  /*<a name="line.56"></a>
+<span class="sourceLineNo">057</span>   * Instance fields.<a name="line.57"></a>
+<span class="sourceLineNo">058</span>   */<a name="line.58"></a>
 <span class="sourceLineNo">059</span><a name="line.59"></a>
-<span class="sourceLineNo">060</span>  /**<a name="line.60"></a>
-<span class="sourceLineNo">061</span>   * Whether to skip execution.<a name="line.61"></a>
-<span class="sourceLineNo">062</span>   */<a name="line.62"></a>
-<span class="sourceLineNo">063</span>  @Parameter(defaultValue = "false")<a name="line.63"></a>
-<span class="sourceLineNo">064</span>  private boolean skip;<a name="line.64"></a>
-<span class="sourceLineNo">065</span><a name="line.65"></a>
-<span class="sourceLineNo">066</span>  /**<a name="line.66"></a>
-<span class="sourceLineNo">067</span>   * The &lt;a<a name="line.67"></a>
-<span class="sourceLineNo">068</span>   * href="https://static.javadoc.io/io.fabric8/kubernetes-client/3.1.8/io/fabric8/kubernetes/client/Config.html"&gt;{@code<a name="line.68"></a>
-<span class="sourceLineNo">069</span>   * Config}&lt;/a&gt; describing how a &lt;a<a name="line.69"></a>
-<span class="sourceLineNo">070</span>   * href="https://static.javadoc.io/io.fabric8/kubernetes-client/3.1.8/io/fabric8/kubernetes/client/DefaultKubernetesClient.html"&gt;{@code<a name="line.70"></a>
-<span class="sourceLineNo">071</span>   * DefaultKubernetesClient}&lt;/a&gt; should connect to a Kubernetes<a name="line.71"></a>
-<span class="sourceLineNo">072</span>   * cluster.<a name="line.72"></a>
-<span class="sourceLineNo">073</span>   */<a name="line.73"></a>
-<span class="sourceLineNo">074</span>  @Parameter<a name="line.74"></a>
-<span class="sourceLineNo">075</span>  private Config clientConfiguration;<a name="line.75"></a>
-<span class="sourceLineNo">076</span><a name="line.76"></a>
+<span class="sourceLineNo">060</span><a name="line.60"></a>
+<span class="sourceLineNo">061</span>  /**<a name="line.61"></a>
+<span class="sourceLineNo">062</span>   * Whether to skip execution.<a name="line.62"></a>
+<span class="sourceLineNo">063</span>   */<a name="line.63"></a>
+<span class="sourceLineNo">064</span>  @Parameter(defaultValue = "false", property = "helm.skip")<a name="line.64"></a>
+<span class="sourceLineNo">065</span>  private boolean skip;<a name="line.65"></a>
+<span class="sourceLineNo">066</span><a name="line.66"></a>
+<span class="sourceLineNo">067</span>  /**<a name="line.67"></a>
+<span class="sourceLineNo">068</span>   * The &lt;a<a name="line.68"></a>
+<span class="sourceLineNo">069</span>   * href="https://static.javadoc.io/io.fabric8/kubernetes-client/3.1.8/io/fabric8/kubernetes/client/Config.html"&gt;{@code<a name="line.69"></a>
+<span class="sourceLineNo">070</span>   * Config}&lt;/a&gt; describing how a &lt;a<a name="line.70"></a>
+<span class="sourceLineNo">071</span>   * href="https://static.javadoc.io/io.fabric8/kubernetes-client/3.1.8/io/fabric8/kubernetes/client/DefaultKubernetesClient.html"&gt;{@code<a name="line.71"></a>
+<span class="sourceLineNo">072</span>   * DefaultKubernetesClient}&lt;/a&gt; should connect to a Kubernetes<a name="line.72"></a>
+<span class="sourceLineNo">073</span>   * cluster.<a name="line.73"></a>
+<span class="sourceLineNo">074</span>   */<a name="line.74"></a>
+<span class="sourceLineNo">075</span>  @Parameter<a name="line.75"></a>
+<span class="sourceLineNo">076</span>  private Config clientConfiguration;<a name="line.76"></a>
 <span class="sourceLineNo">077</span><a name="line.77"></a>
-<span class="sourceLineNo">078</span>  /*<a name="line.78"></a>
-<span class="sourceLineNo">079</span>   * Constructors.<a name="line.79"></a>
+<span class="sourceLineNo">078</span>  /**<a name="line.78"></a>
+<span class="sourceLineNo">079</span>   * The Kubernetes cluster namespace in which Tiller may be found.<a name="line.79"></a>
 <span class="sourceLineNo">080</span>   */<a name="line.80"></a>
-<span class="sourceLineNo">081</span><a name="line.81"></a>
-<span class="sourceLineNo">082</span><a name="line.82"></a>
-<span class="sourceLineNo">083</span>  /**<a name="line.83"></a>
-<span class="sourceLineNo">084</span>   * Creates a new {@link AbstractReleaseMojo}.<a name="line.84"></a>
-<span class="sourceLineNo">085</span>   */<a name="line.85"></a>
-<span class="sourceLineNo">086</span>  protected AbstractReleaseMojo() {<a name="line.86"></a>
-<span class="sourceLineNo">087</span>    super();<a name="line.87"></a>
-<span class="sourceLineNo">088</span>  }<a name="line.88"></a>
+<span class="sourceLineNo">081</span>  @Parameter(defaultValue = "kube-system", property = "tiller.namespace")<a name="line.81"></a>
+<span class="sourceLineNo">082</span>  private String tillerNamespace;<a name="line.82"></a>
+<span class="sourceLineNo">083</span>  <a name="line.83"></a>
+<span class="sourceLineNo">084</span>  /**<a name="line.84"></a>
+<span class="sourceLineNo">085</span>   * The port on which Tiller may be reached.<a name="line.85"></a>
+<span class="sourceLineNo">086</span>   */<a name="line.86"></a>
+<span class="sourceLineNo">087</span>  @Parameter(defaultValue = "44134", property = "tiller.port")<a name="line.87"></a>
+<span class="sourceLineNo">088</span>  private int tillerPort;<a name="line.88"></a>
 <span class="sourceLineNo">089</span><a name="line.89"></a>
-<span class="sourceLineNo">090</span><a name="line.90"></a>
-<span class="sourceLineNo">091</span>  /*<a name="line.91"></a>
-<span class="sourceLineNo">092</span>   * Public instance methods.<a name="line.92"></a>
-<span class="sourceLineNo">093</span>   */<a name="line.93"></a>
-<span class="sourceLineNo">094</span><a name="line.94"></a>
+<span class="sourceLineNo">090</span>  /**<a name="line.90"></a>
+<span class="sourceLineNo">091</span>   * The Kubernetes labels normally found on Tiller pods.<a name="line.91"></a>
+<span class="sourceLineNo">092</span>   */<a name="line.92"></a>
+<span class="sourceLineNo">093</span>  @Parameter(property = "tiller.labels")<a name="line.93"></a>
+<span class="sourceLineNo">094</span>  private Map&lt;String, String&gt; tillerLabels;<a name="line.94"></a>
 <span class="sourceLineNo">095</span><a name="line.95"></a>
-<span class="sourceLineNo">096</span>  /**<a name="line.96"></a>
-<span class="sourceLineNo">097</span>   * {@linkplain #getSkip() Skips} execution if instructed, or calls<a name="line.97"></a>
-<span class="sourceLineNo">098</span>   * the {@link #execute(Callable)} method with a {@link Callable}<a name="line.98"></a>
-<span class="sourceLineNo">099</span>   * containing the results of an invocation of the {@link<a name="line.99"></a>
-<span class="sourceLineNo">100</span>   * #createReleaseManager(Tiller)} method.<a name="line.100"></a>
-<span class="sourceLineNo">101</span>   *<a name="line.101"></a>
-<span class="sourceLineNo">102</span>   * @exception MojoExecutionException if there was a problem<a name="line.102"></a>
-<span class="sourceLineNo">103</span>   * executing this mojo<a name="line.103"></a>
-<span class="sourceLineNo">104</span>   *<a name="line.104"></a>
-<span class="sourceLineNo">105</span>   * @exception MojoFailureException if the mojo executed properly,<a name="line.105"></a>
-<span class="sourceLineNo">106</span>   * but the job it was to perform failed in some way<a name="line.106"></a>
-<span class="sourceLineNo">107</span>   */<a name="line.107"></a>
-<span class="sourceLineNo">108</span>  @Override<a name="line.108"></a>
-<span class="sourceLineNo">109</span>  public void execute() throws MojoExecutionException, MojoFailureException {<a name="line.109"></a>
-<span class="sourceLineNo">110</span>    final Log log = this.getLog();<a name="line.110"></a>
-<span class="sourceLineNo">111</span>    assert log != null;<a name="line.111"></a>
-<span class="sourceLineNo">112</span><a name="line.112"></a>
-<span class="sourceLineNo">113</span>    if (this.getSkip()) {<a name="line.113"></a>
-<span class="sourceLineNo">114</span>      if (log.isDebugEnabled()) {<a name="line.114"></a>
-<span class="sourceLineNo">115</span>        log.debug("Skipping execution by request.");<a name="line.115"></a>
-<span class="sourceLineNo">116</span>      }<a name="line.116"></a>
-<span class="sourceLineNo">117</span>      return;<a name="line.117"></a>
-<span class="sourceLineNo">118</span>    }<a name="line.118"></a>
-<span class="sourceLineNo">119</span><a name="line.119"></a>
-<span class="sourceLineNo">120</span>    final ReleaseManagerCallable releaseManagerCallable = new ReleaseManagerCallable();<a name="line.120"></a>
-<span class="sourceLineNo">121</span>    Throwable throwable = null;<a name="line.121"></a>
-<span class="sourceLineNo">122</span>    try {<a name="line.122"></a>
-<span class="sourceLineNo">123</span>      this.execute(releaseManagerCallable);<a name="line.123"></a>
-<span class="sourceLineNo">124</span>    } catch (final InterruptedException interruptedException) {<a name="line.124"></a>
-<span class="sourceLineNo">125</span>      Thread.currentThread().interrupt();<a name="line.125"></a>
-<span class="sourceLineNo">126</span>      final MojoExecutionException mojoExecutionException = new MojoExecutionException(interruptedException.getMessage(), interruptedException);<a name="line.126"></a>
-<span class="sourceLineNo">127</span>      throwable = mojoExecutionException;<a name="line.127"></a>
-<span class="sourceLineNo">128</span>      throw mojoExecutionException;<a name="line.128"></a>
-<span class="sourceLineNo">129</span>    } catch (final RuntimeException | MojoExecutionException | MojoFailureException throwMe) {<a name="line.129"></a>
-<span class="sourceLineNo">130</span>      throwable = throwMe;<a name="line.130"></a>
-<span class="sourceLineNo">131</span>      throw throwMe;<a name="line.131"></a>
-<span class="sourceLineNo">132</span>    } catch (final Exception otherStuff) {<a name="line.132"></a>
-<span class="sourceLineNo">133</span>      final MojoExecutionException mojoExecutionException = new MojoExecutionException(otherStuff.getMessage(), otherStuff);<a name="line.133"></a>
-<span class="sourceLineNo">134</span>      throwable = mojoExecutionException;<a name="line.134"></a>
-<span class="sourceLineNo">135</span>      throw mojoExecutionException;<a name="line.135"></a>
-<span class="sourceLineNo">136</span>    } finally {<a name="line.136"></a>
-<span class="sourceLineNo">137</span>      if (releaseManagerCallable.releaseManager != null) {<a name="line.137"></a>
-<span class="sourceLineNo">138</span>        try {<a name="line.138"></a>
-<span class="sourceLineNo">139</span>          releaseManagerCallable.releaseManager.close();<a name="line.139"></a>
-<span class="sourceLineNo">140</span>        } catch (final IOException ioException) {<a name="line.140"></a>
-<span class="sourceLineNo">141</span>          if (throwable != null) {<a name="line.141"></a>
-<span class="sourceLineNo">142</span>            throwable.addSuppressed(ioException);<a name="line.142"></a>
-<span class="sourceLineNo">143</span>          } else {<a name="line.143"></a>
-<span class="sourceLineNo">144</span>            throw new MojoExecutionException(ioException.getMessage(), ioException);<a name="line.144"></a>
-<span class="sourceLineNo">145</span>          }<a name="line.145"></a>
-<span class="sourceLineNo">146</span>        }<a name="line.146"></a>
-<span class="sourceLineNo">147</span>      }<a name="line.147"></a>
-<span class="sourceLineNo">148</span>    }<a name="line.148"></a>
-<span class="sourceLineNo">149</span>  }<a name="line.149"></a>
-<span class="sourceLineNo">150</span><a name="line.150"></a>
-<span class="sourceLineNo">151</span>  /**<a name="line.151"></a>
-<span class="sourceLineNo">152</span>   * Returns the {@link Config} describing how a {@link<a name="line.152"></a>
-<span class="sourceLineNo">153</span>   * DefaultKubernetesClient} is to connect to a Kubernetes cluster.<a name="line.153"></a>
-<span class="sourceLineNo">154</span>   *<a name="line.154"></a>
-<span class="sourceLineNo">155</span>   * &lt;p&gt;This method may return {@code null}.&lt;/p&gt;<a name="line.155"></a>
-<span class="sourceLineNo">156</span>   *<a name="line.156"></a>
-<span class="sourceLineNo">157</span>   * &lt;p&gt;Overrides of this method may return {@code null}.&lt;/p&gt;<a name="line.157"></a>
-<span class="sourceLineNo">158</span>   *<a name="line.158"></a>
-<span class="sourceLineNo">159</span>   * @return a {@link Config}, or {@code null}<a name="line.159"></a>
-<span class="sourceLineNo">160</span>   *<a name="line.160"></a>
-<span class="sourceLineNo">161</span>   * @see #setClientConfiguration(Config)<a name="line.161"></a>
-<span class="sourceLineNo">162</span>   */<a name="line.162"></a>
-<span class="sourceLineNo">163</span>  public Config getClientConfiguration() {<a name="line.163"></a>
-<span class="sourceLineNo">164</span>    return this.clientConfiguration;<a name="line.164"></a>
-<span class="sourceLineNo">165</span>  }<a name="line.165"></a>
-<span class="sourceLineNo">166</span><a name="line.166"></a>
-<span class="sourceLineNo">167</span>  /**<a name="line.167"></a>
-<span class="sourceLineNo">168</span>   * Installs the {@link Config} describing how a {@link<a name="line.168"></a>
-<span class="sourceLineNo">169</span>   * DefaultKubernetesClient} is to connect to a Kubernetes cluster.<a name="line.169"></a>
-<span class="sourceLineNo">170</span>   *<a name="line.170"></a>
-<span class="sourceLineNo">171</span>   * @param config the {@link Config} to use; may be {@code null}<a name="line.171"></a>
-<span class="sourceLineNo">172</span>   *<a name="line.172"></a>
-<span class="sourceLineNo">173</span>   * @see #getClientConfiguration()<a name="line.173"></a>
-<span class="sourceLineNo">174</span>   */<a name="line.174"></a>
-<span class="sourceLineNo">175</span>  public void setClientConfiguration(final Config config) {<a name="line.175"></a>
-<span class="sourceLineNo">176</span>    this.clientConfiguration = config;<a name="line.176"></a>
-<span class="sourceLineNo">177</span>  }<a name="line.177"></a>
-<span class="sourceLineNo">178</span><a name="line.178"></a>
-<span class="sourceLineNo">179</span>  /**<a name="line.179"></a>
-<span class="sourceLineNo">180</span>   * Returns {@code true} if this {@link AbstractReleaseMojo} should<a name="line.180"></a>
-<span class="sourceLineNo">181</span>   * not execute.<a name="line.181"></a>
-<span class="sourceLineNo">182</span>   *<a name="line.182"></a>
-<span class="sourceLineNo">183</span>   * @return {@code true} if this {@link AbstractReleaseMojo} should<a name="line.183"></a>
-<span class="sourceLineNo">184</span>   * not execute; {@code false} otherwise<a name="line.184"></a>
-<span class="sourceLineNo">185</span>   *<a name="line.185"></a>
-<span class="sourceLineNo">186</span>   * @see #setSkip(boolean)<a name="line.186"></a>
-<span class="sourceLineNo">187</span>   */<a name="line.187"></a>
-<span class="sourceLineNo">188</span>  public boolean getSkip() {<a name="line.188"></a>
-<span class="sourceLineNo">189</span>    return this.skip;<a name="line.189"></a>
-<span class="sourceLineNo">190</span>  }<a name="line.190"></a>
-<span class="sourceLineNo">191</span><a name="line.191"></a>
-<span class="sourceLineNo">192</span>  /**<a name="line.192"></a>
-<span class="sourceLineNo">193</span>   * Controls whether this {@link AbstractReleaseMojo} should execute.<a name="line.193"></a>
-<span class="sourceLineNo">194</span>   *<a name="line.194"></a>
-<span class="sourceLineNo">195</span>   * @param skip if {@code true}, this {@link AbstractReleaseMojo}<a name="line.195"></a>
-<span class="sourceLineNo">196</span>   * will not execute<a name="line.196"></a>
-<span class="sourceLineNo">197</span>   *<a name="line.197"></a>
-<span class="sourceLineNo">198</span>   * @see #getSkip()<a name="line.198"></a>
-<span class="sourceLineNo">199</span>   */<a name="line.199"></a>
-<span class="sourceLineNo">200</span>  public void setSkip(final boolean skip) {<a name="line.200"></a>
-<span class="sourceLineNo">201</span>    this.skip = skip;<a name="line.201"></a>
-<span class="sourceLineNo">202</span>  }<a name="line.202"></a>
-<span class="sourceLineNo">203</span><a name="line.203"></a>
-<span class="sourceLineNo">204</span><a name="line.204"></a>
-<span class="sourceLineNo">205</span>  /*<a name="line.205"></a>
-<span class="sourceLineNo">206</span>   * Protected instance methods.<a name="line.206"></a>
-<span class="sourceLineNo">207</span>   */<a name="line.207"></a>
-<span class="sourceLineNo">208</span>  <a name="line.208"></a>
-<span class="sourceLineNo">209</span><a name="line.209"></a>
-<span class="sourceLineNo">210</span>  /**<a name="line.210"></a>
-<span class="sourceLineNo">211</span>   * Performs a release-oriented task using a {@link ReleaseManager}<a name="line.211"></a>
-<span class="sourceLineNo">212</span>   * {@linkplain Callable#call() available} from the supplied {@link<a name="line.212"></a>
-<span class="sourceLineNo">213</span>   * Callable}.<a name="line.213"></a>
-<span class="sourceLineNo">214</span>   *<a name="line.214"></a>
-<span class="sourceLineNo">215</span>   * @param releaseManagerCallable the {@link Callable} that will<a name="line.215"></a>
-<span class="sourceLineNo">216</span>   * provide a {@link ReleaseManager}; must not be {@code null}<a name="line.216"></a>
-<span class="sourceLineNo">217</span>   *<a name="line.217"></a>
-<span class="sourceLineNo">218</span>   * @exception Exception if an error occurs<a name="line.218"></a>
-<span class="sourceLineNo">219</span>   */<a name="line.219"></a>
-<span class="sourceLineNo">220</span>  protected abstract void execute(final Callable&lt;ReleaseManager&gt; releaseManagerCallable) throws Exception;<a name="line.220"></a>
-<span class="sourceLineNo">221</span><a name="line.221"></a>
-<span class="sourceLineNo">222</span>  /**<a name="line.222"></a>
-<span class="sourceLineNo">223</span>   * Creates a {@link DefaultKubernetesClient} for communicating with<a name="line.223"></a>
-<span class="sourceLineNo">224</span>   * Kubernetes clusters.<a name="line.224"></a>
+<span class="sourceLineNo">096</span>  <a name="line.96"></a>
+<span class="sourceLineNo">097</span>  /*<a name="line.97"></a>
+<span class="sourceLineNo">098</span>   * Constructors.<a name="line.98"></a>
+<span class="sourceLineNo">099</span>   */<a name="line.99"></a>
+<span class="sourceLineNo">100</span><a name="line.100"></a>
+<span class="sourceLineNo">101</span><a name="line.101"></a>
+<span class="sourceLineNo">102</span>  /**<a name="line.102"></a>
+<span class="sourceLineNo">103</span>   * Creates a new {@link AbstractReleaseMojo}.<a name="line.103"></a>
+<span class="sourceLineNo">104</span>   */<a name="line.104"></a>
+<span class="sourceLineNo">105</span>  protected AbstractReleaseMojo() {<a name="line.105"></a>
+<span class="sourceLineNo">106</span>    super();<a name="line.106"></a>
+<span class="sourceLineNo">107</span>  }<a name="line.107"></a>
+<span class="sourceLineNo">108</span><a name="line.108"></a>
+<span class="sourceLineNo">109</span><a name="line.109"></a>
+<span class="sourceLineNo">110</span>  /*<a name="line.110"></a>
+<span class="sourceLineNo">111</span>   * Public instance methods.<a name="line.111"></a>
+<span class="sourceLineNo">112</span>   */<a name="line.112"></a>
+<span class="sourceLineNo">113</span><a name="line.113"></a>
+<span class="sourceLineNo">114</span><a name="line.114"></a>
+<span class="sourceLineNo">115</span>  /**<a name="line.115"></a>
+<span class="sourceLineNo">116</span>   * {@linkplain #getSkip() Skips} execution if instructed, or calls<a name="line.116"></a>
+<span class="sourceLineNo">117</span>   * the {@link #execute(Callable)} method with a {@link Callable}<a name="line.117"></a>
+<span class="sourceLineNo">118</span>   * containing the results of an invocation of the {@link<a name="line.118"></a>
+<span class="sourceLineNo">119</span>   * #createReleaseManager(Tiller)} method.<a name="line.119"></a>
+<span class="sourceLineNo">120</span>   *<a name="line.120"></a>
+<span class="sourceLineNo">121</span>   * @exception MojoExecutionException if there was a problem<a name="line.121"></a>
+<span class="sourceLineNo">122</span>   * executing this mojo<a name="line.122"></a>
+<span class="sourceLineNo">123</span>   *<a name="line.123"></a>
+<span class="sourceLineNo">124</span>   * @exception MojoFailureException if the mojo executed properly,<a name="line.124"></a>
+<span class="sourceLineNo">125</span>   * but the job it was to perform failed in some way<a name="line.125"></a>
+<span class="sourceLineNo">126</span>   */<a name="line.126"></a>
+<span class="sourceLineNo">127</span>  @Override<a name="line.127"></a>
+<span class="sourceLineNo">128</span>  public void execute() throws MojoExecutionException, MojoFailureException {<a name="line.128"></a>
+<span class="sourceLineNo">129</span>    final Log log = this.getLog();<a name="line.129"></a>
+<span class="sourceLineNo">130</span>    assert log != null;<a name="line.130"></a>
+<span class="sourceLineNo">131</span><a name="line.131"></a>
+<span class="sourceLineNo">132</span>    if (this.getSkip()) {<a name="line.132"></a>
+<span class="sourceLineNo">133</span>      if (log.isDebugEnabled()) {<a name="line.133"></a>
+<span class="sourceLineNo">134</span>        log.debug("Skipping execution by request.");<a name="line.134"></a>
+<span class="sourceLineNo">135</span>      }<a name="line.135"></a>
+<span class="sourceLineNo">136</span>      return;<a name="line.136"></a>
+<span class="sourceLineNo">137</span>    }<a name="line.137"></a>
+<span class="sourceLineNo">138</span><a name="line.138"></a>
+<span class="sourceLineNo">139</span>    final ReleaseManagerCallable releaseManagerCallable = new ReleaseManagerCallable();<a name="line.139"></a>
+<span class="sourceLineNo">140</span>    Throwable throwable = null;<a name="line.140"></a>
+<span class="sourceLineNo">141</span>    try {<a name="line.141"></a>
+<span class="sourceLineNo">142</span>      this.execute(releaseManagerCallable);<a name="line.142"></a>
+<span class="sourceLineNo">143</span>    } catch (final InterruptedException interruptedException) {<a name="line.143"></a>
+<span class="sourceLineNo">144</span>      Thread.currentThread().interrupt();<a name="line.144"></a>
+<span class="sourceLineNo">145</span>      final MojoExecutionException mojoExecutionException = new MojoExecutionException(interruptedException.getMessage(), interruptedException);<a name="line.145"></a>
+<span class="sourceLineNo">146</span>      throwable = mojoExecutionException;<a name="line.146"></a>
+<span class="sourceLineNo">147</span>      throw mojoExecutionException;<a name="line.147"></a>
+<span class="sourceLineNo">148</span>    } catch (final RuntimeException | MojoExecutionException | MojoFailureException throwMe) {<a name="line.148"></a>
+<span class="sourceLineNo">149</span>      throwable = throwMe;<a name="line.149"></a>
+<span class="sourceLineNo">150</span>      throw throwMe;<a name="line.150"></a>
+<span class="sourceLineNo">151</span>    } catch (final Exception otherStuff) {<a name="line.151"></a>
+<span class="sourceLineNo">152</span>      final MojoExecutionException mojoExecutionException = new MojoExecutionException(otherStuff.getMessage(), otherStuff);<a name="line.152"></a>
+<span class="sourceLineNo">153</span>      throwable = mojoExecutionException;<a name="line.153"></a>
+<span class="sourceLineNo">154</span>      throw mojoExecutionException;<a name="line.154"></a>
+<span class="sourceLineNo">155</span>    } finally {<a name="line.155"></a>
+<span class="sourceLineNo">156</span>      if (releaseManagerCallable.releaseManager != null) {<a name="line.156"></a>
+<span class="sourceLineNo">157</span>        try {<a name="line.157"></a>
+<span class="sourceLineNo">158</span>          releaseManagerCallable.releaseManager.close();<a name="line.158"></a>
+<span class="sourceLineNo">159</span>        } catch (final IOException ioException) {<a name="line.159"></a>
+<span class="sourceLineNo">160</span>          if (throwable != null) {<a name="line.160"></a>
+<span class="sourceLineNo">161</span>            throwable.addSuppressed(ioException);<a name="line.161"></a>
+<span class="sourceLineNo">162</span>          } else {<a name="line.162"></a>
+<span class="sourceLineNo">163</span>            throw new MojoExecutionException(ioException.getMessage(), ioException);<a name="line.163"></a>
+<span class="sourceLineNo">164</span>          }<a name="line.164"></a>
+<span class="sourceLineNo">165</span>        }<a name="line.165"></a>
+<span class="sourceLineNo">166</span>      }<a name="line.166"></a>
+<span class="sourceLineNo">167</span>    }<a name="line.167"></a>
+<span class="sourceLineNo">168</span>  }<a name="line.168"></a>
+<span class="sourceLineNo">169</span><a name="line.169"></a>
+<span class="sourceLineNo">170</span>  /**<a name="line.170"></a>
+<span class="sourceLineNo">171</span>   * Returns the {@link Config} describing how a {@link<a name="line.171"></a>
+<span class="sourceLineNo">172</span>   * DefaultKubernetesClient} is to connect to a Kubernetes cluster.<a name="line.172"></a>
+<span class="sourceLineNo">173</span>   *<a name="line.173"></a>
+<span class="sourceLineNo">174</span>   * &lt;p&gt;This method may return {@code null}.&lt;/p&gt;<a name="line.174"></a>
+<span class="sourceLineNo">175</span>   *<a name="line.175"></a>
+<span class="sourceLineNo">176</span>   * &lt;p&gt;Overrides of this method may return {@code null}.&lt;/p&gt;<a name="line.176"></a>
+<span class="sourceLineNo">177</span>   *<a name="line.177"></a>
+<span class="sourceLineNo">178</span>   * @return a {@link Config}, or {@code null}<a name="line.178"></a>
+<span class="sourceLineNo">179</span>   *<a name="line.179"></a>
+<span class="sourceLineNo">180</span>   * @see #setClientConfiguration(Config)<a name="line.180"></a>
+<span class="sourceLineNo">181</span>   */<a name="line.181"></a>
+<span class="sourceLineNo">182</span>  public Config getClientConfiguration() {<a name="line.182"></a>
+<span class="sourceLineNo">183</span>    return this.clientConfiguration;<a name="line.183"></a>
+<span class="sourceLineNo">184</span>  }<a name="line.184"></a>
+<span class="sourceLineNo">185</span><a name="line.185"></a>
+<span class="sourceLineNo">186</span>  /**<a name="line.186"></a>
+<span class="sourceLineNo">187</span>   * Installs the {@link Config} describing how a {@link<a name="line.187"></a>
+<span class="sourceLineNo">188</span>   * DefaultKubernetesClient} is to connect to a Kubernetes cluster.<a name="line.188"></a>
+<span class="sourceLineNo">189</span>   *<a name="line.189"></a>
+<span class="sourceLineNo">190</span>   * @param config the {@link Config} to use; may be {@code null}<a name="line.190"></a>
+<span class="sourceLineNo">191</span>   *<a name="line.191"></a>
+<span class="sourceLineNo">192</span>   * @see #getClientConfiguration()<a name="line.192"></a>
+<span class="sourceLineNo">193</span>   */<a name="line.193"></a>
+<span class="sourceLineNo">194</span>  public void setClientConfiguration(final Config config) {<a name="line.194"></a>
+<span class="sourceLineNo">195</span>    this.clientConfiguration = config;<a name="line.195"></a>
+<span class="sourceLineNo">196</span>  }  <a name="line.196"></a>
+<span class="sourceLineNo">197</span><a name="line.197"></a>
+<span class="sourceLineNo">198</span>  /**<a name="line.198"></a>
+<span class="sourceLineNo">199</span>   * Returns {@code true} if this {@link AbstractReleaseMojo} should<a name="line.199"></a>
+<span class="sourceLineNo">200</span>   * not execute.<a name="line.200"></a>
+<span class="sourceLineNo">201</span>   *<a name="line.201"></a>
+<span class="sourceLineNo">202</span>   * @return {@code true} if this {@link AbstractReleaseMojo} should<a name="line.202"></a>
+<span class="sourceLineNo">203</span>   * not execute; {@code false} otherwise<a name="line.203"></a>
+<span class="sourceLineNo">204</span>   *<a name="line.204"></a>
+<span class="sourceLineNo">205</span>   * @see #setSkip(boolean)<a name="line.205"></a>
+<span class="sourceLineNo">206</span>   */<a name="line.206"></a>
+<span class="sourceLineNo">207</span>  public boolean getSkip() {<a name="line.207"></a>
+<span class="sourceLineNo">208</span>    return this.skip;<a name="line.208"></a>
+<span class="sourceLineNo">209</span>  }<a name="line.209"></a>
+<span class="sourceLineNo">210</span><a name="line.210"></a>
+<span class="sourceLineNo">211</span>  /**<a name="line.211"></a>
+<span class="sourceLineNo">212</span>   * Controls whether this {@link AbstractReleaseMojo} should execute.<a name="line.212"></a>
+<span class="sourceLineNo">213</span>   *<a name="line.213"></a>
+<span class="sourceLineNo">214</span>   * @param skip if {@code true}, this {@link AbstractReleaseMojo}<a name="line.214"></a>
+<span class="sourceLineNo">215</span>   * will not execute<a name="line.215"></a>
+<span class="sourceLineNo">216</span>   *<a name="line.216"></a>
+<span class="sourceLineNo">217</span>   * @see #getSkip()<a name="line.217"></a>
+<span class="sourceLineNo">218</span>   */<a name="line.218"></a>
+<span class="sourceLineNo">219</span>  public void setSkip(final boolean skip) {<a name="line.219"></a>
+<span class="sourceLineNo">220</span>    this.skip = skip;<a name="line.220"></a>
+<span class="sourceLineNo">221</span>  }<a name="line.221"></a>
+<span class="sourceLineNo">222</span><a name="line.222"></a>
+<span class="sourceLineNo">223</span>  /**<a name="line.223"></a>
+<span class="sourceLineNo">224</span>   * Returns the Kubernetes namespace in which Tiller may be found.<a name="line.224"></a>
 <span class="sourceLineNo">225</span>   *<a name="line.225"></a>
-<span class="sourceLineNo">226</span>   * &lt;p&gt;This method never returns {@code null}.&lt;/p&gt;<a name="line.226"></a>
+<span class="sourceLineNo">226</span>   * &lt;p&gt;This method may return {@code null}.&lt;/p&gt;<a name="line.226"></a>
 <span class="sourceLineNo">227</span>   *<a name="line.227"></a>
-<span class="sourceLineNo">228</span>   * &lt;p&gt;Overrides of this method must not return {@code null}.&lt;/p&gt;<a name="line.228"></a>
-<span class="sourceLineNo">229</span>   *<a name="line.229"></a>
-<span class="sourceLineNo">230</span>   * &lt;p&gt;The default implementation calls the {@link<a name="line.230"></a>
-<span class="sourceLineNo">231</span>   * #getClientConfiguration()} method and {@linkplain<a name="line.231"></a>
-<span class="sourceLineNo">232</span>   * DefaultKubernetesClient#DefaultKubernetesClient(Config) uses its<a name="line.232"></a>
-<span class="sourceLineNo">233</span>   * return value}, unless it is {@code null}, in which case a new<a name="line.233"></a>
-<span class="sourceLineNo">234</span>   * {@link DefaultKubernetesClient} is created via its {@linkplain<a name="line.234"></a>
-<span class="sourceLineNo">235</span>   * DefaultKubernetesClient#DefaultKubernetesClient() no-argument<a name="line.235"></a>
-<span class="sourceLineNo">236</span>   * constructor}.&lt;/p&gt;<a name="line.236"></a>
+<span class="sourceLineNo">228</span>   * @return the Kubernetes namespace in which Tiller may be found, or<a name="line.228"></a>
+<span class="sourceLineNo">229</span>   * {@code null}<a name="line.229"></a>
+<span class="sourceLineNo">230</span>   */<a name="line.230"></a>
+<span class="sourceLineNo">231</span>  public String getTillerNamespace() {<a name="line.231"></a>
+<span class="sourceLineNo">232</span>    return this.tillerNamespace;<a name="line.232"></a>
+<span class="sourceLineNo">233</span>  }<a name="line.233"></a>
+<span class="sourceLineNo">234</span><a name="line.234"></a>
+<span class="sourceLineNo">235</span>  /**<a name="line.235"></a>
+<span class="sourceLineNo">236</span>   * Sets the Kubernetes namespace in which Tiller may be found.<a name="line.236"></a>
 <span class="sourceLineNo">237</span>   *<a name="line.237"></a>
-<span class="sourceLineNo">238</span>   * @return a new, non-{@code null} {@link DefaultKubernetesClient}<a name="line.238"></a>
-<span class="sourceLineNo">239</span>   *<a name="line.239"></a>
-<span class="sourceLineNo">240</span>   * @exception IOException if there was a problem creating the client<a name="line.240"></a>
-<span class="sourceLineNo">241</span>   */<a name="line.241"></a>
-<span class="sourceLineNo">242</span>  protected DefaultKubernetesClient createClient() throws IOException {<a name="line.242"></a>
-<span class="sourceLineNo">243</span>    final DefaultKubernetesClient client;<a name="line.243"></a>
-<span class="sourceLineNo">244</span>    final Config config = this.getClientConfiguration();<a name="line.244"></a>
-<span class="sourceLineNo">245</span>    if (config == null) {<a name="line.245"></a>
-<span class="sourceLineNo">246</span>      client = new DefaultKubernetesClient();<a name="line.246"></a>
-<span class="sourceLineNo">247</span>    } else {<a name="line.247"></a>
-<span class="sourceLineNo">248</span>      client = new DefaultKubernetesClient(config);<a name="line.248"></a>
-<span class="sourceLineNo">249</span>    }<a name="line.249"></a>
-<span class="sourceLineNo">250</span>    return client;<a name="line.250"></a>
-<span class="sourceLineNo">251</span>  }<a name="line.251"></a>
-<span class="sourceLineNo">252</span><a name="line.252"></a>
-<span class="sourceLineNo">253</span>  /**<a name="line.253"></a>
-<span class="sourceLineNo">254</span>   * Creates a {@link Tiller} and returns it.<a name="line.254"></a>
-<span class="sourceLineNo">255</span>   *<a name="line.255"></a>
-<span class="sourceLineNo">256</span>   * &lt;p&gt;This method never returns {@code null}.&lt;/p&gt;<a name="line.256"></a>
-<span class="sourceLineNo">257</span>   *<a name="line.257"></a>
-<span class="sourceLineNo">258</span>   * &lt;p&gt;Overrides of this method must not return {@code null}.&lt;/p&gt;<a name="line.258"></a>
+<span class="sourceLineNo">238</span>   * @param tillerNamespace the Kubernetes namespace in which Tiller<a name="line.238"></a>
+<span class="sourceLineNo">239</span>   * may be found; may be {@code null} in which case {@code<a name="line.239"></a>
+<span class="sourceLineNo">240</span>   * kube-system} will be used by the {@link<a name="line.240"></a>
+<span class="sourceLineNo">241</span>   * #createTiller(DefaultKubernetesClient)} method instead<a name="line.241"></a>
+<span class="sourceLineNo">242</span>   */<a name="line.242"></a>
+<span class="sourceLineNo">243</span>  public void setTillerNamespace(String tillerNamespace) {<a name="line.243"></a>
+<span class="sourceLineNo">244</span>    this.tillerNamespace = tillerNamespace;<a name="line.244"></a>
+<span class="sourceLineNo">245</span>  }<a name="line.245"></a>
+<span class="sourceLineNo">246</span><a name="line.246"></a>
+<span class="sourceLineNo">247</span>  /**<a name="line.247"></a>
+<span class="sourceLineNo">248</span>   * Returns the port on which Tiller may be found.<a name="line.248"></a>
+<span class="sourceLineNo">249</span>   *<a name="line.249"></a>
+<span class="sourceLineNo">250</span>   * @return the port on which Tiller may be found; normally {@code<a name="line.250"></a>
+<span class="sourceLineNo">251</span>   * 44134}<a name="line.251"></a>
+<span class="sourceLineNo">252</span>   */<a name="line.252"></a>
+<span class="sourceLineNo">253</span>  public int getTillerPort() {<a name="line.253"></a>
+<span class="sourceLineNo">254</span>    return this.tillerPort;<a name="line.254"></a>
+<span class="sourceLineNo">255</span>  }<a name="line.255"></a>
+<span class="sourceLineNo">256</span><a name="line.256"></a>
+<span class="sourceLineNo">257</span>  /**<a name="line.257"></a>
+<span class="sourceLineNo">258</span>   * Sets the port on which Tiller may be found.<a name="line.258"></a>
 <span class="sourceLineNo">259</span>   *<a name="line.259"></a>
-<span class="sourceLineNo">260</span>   * &lt;p&gt;This implementation passes the supplied {@link<a name="line.260"></a>
-<span class="sourceLineNo">261</span>   * DefaultKubernetesClient} to the &lt;a<a name="line.261"></a>
-<span class="sourceLineNo">262</span>   * href="https://microbean.github.io/microbean-helm/apidocs/org/microbean/helm/Tiller.html#Tiller-T-"&gt;appropriate<a name="line.262"></a>
-<span class="sourceLineNo">263</span>   * &lt;code&gt;Tiller&lt;/code&gt; constructor&lt;/a&gt;.&lt;/p&gt;<a name="line.263"></a>
-<span class="sourceLineNo">264</span>   *<a name="line.264"></a>
-<span class="sourceLineNo">265</span>   * @param client the {@link DefaultKubernetesClient} to use to<a name="line.265"></a>
-<span class="sourceLineNo">266</span>   * communicate with a Kubernetes cluster; must not be {@code null}<a name="line.266"></a>
-<span class="sourceLineNo">267</span>   *<a name="line.267"></a>
-<span class="sourceLineNo">268</span>   * @return a new {@link Tiller}; never {@code null}<a name="line.268"></a>
+<span class="sourceLineNo">260</span>   * @param tillerPort the port on which Tiller may be found; normally<a name="line.260"></a>
+<span class="sourceLineNo">261</span>   * {@code 44134}<a name="line.261"></a>
+<span class="sourceLineNo">262</span>   */<a name="line.262"></a>
+<span class="sourceLineNo">263</span>  public void setTillerPort(final int tillerPort) {<a name="line.263"></a>
+<span class="sourceLineNo">264</span>    this.tillerPort = tillerPort;<a name="line.264"></a>
+<span class="sourceLineNo">265</span>  }<a name="line.265"></a>
+<span class="sourceLineNo">266</span><a name="line.266"></a>
+<span class="sourceLineNo">267</span>  /**<a name="line.267"></a>
+<span class="sourceLineNo">268</span>   * Returns the Kubernetes labels that Tiller Pods have.<a name="line.268"></a>
 <span class="sourceLineNo">269</span>   *<a name="line.269"></a>
-<span class="sourceLineNo">270</span>   * @exception NullPointerException if {@code client} is {@code null}<a name="line.270"></a>
+<span class="sourceLineNo">270</span>   * &lt;p&gt;This method may return {@code null}.&lt;/p&gt;<a name="line.270"></a>
 <span class="sourceLineNo">271</span>   *<a name="line.271"></a>
-<span class="sourceLineNo">272</span>   * @exception IOException if there was a problem creating a {@link<a name="line.272"></a>
-<span class="sourceLineNo">273</span>   * Tiller}<a name="line.273"></a>
+<span class="sourceLineNo">272</span>   * @return the Kubernetes labels that Tiller Pods have, or {@code<a name="line.272"></a>
+<span class="sourceLineNo">273</span>   * null}<a name="line.273"></a>
 <span class="sourceLineNo">274</span>   */<a name="line.274"></a>
-<span class="sourceLineNo">275</span>  protected Tiller createTiller(final DefaultKubernetesClient client) throws IOException {<a name="line.275"></a>
-<span class="sourceLineNo">276</span>    Objects.requireNonNull(client);<a name="line.276"></a>
-<span class="sourceLineNo">277</span>    return new Tiller(client);<a name="line.277"></a>
-<span class="sourceLineNo">278</span>  }<a name="line.278"></a>
-<span class="sourceLineNo">279</span><a name="line.279"></a>
-<span class="sourceLineNo">280</span>  /**<a name="line.280"></a>
-<span class="sourceLineNo">281</span>   * Creates a {@link ReleaseManager} and returns it.<a name="line.281"></a>
-<span class="sourceLineNo">282</span>   *<a name="line.282"></a>
-<span class="sourceLineNo">283</span>   * &lt;p&gt;This method never returns {@code null}.&lt;/p&gt;<a name="line.283"></a>
+<span class="sourceLineNo">275</span>  public Map&lt;String, String&gt; getTillerLabels() {<a name="line.275"></a>
+<span class="sourceLineNo">276</span>    return this.tillerLabels;<a name="line.276"></a>
+<span class="sourceLineNo">277</span>  }<a name="line.277"></a>
+<span class="sourceLineNo">278</span><a name="line.278"></a>
+<span class="sourceLineNo">279</span>  /**<a name="line.279"></a>
+<span class="sourceLineNo">280</span>   * Sets the Kubernetes labels that Tiller Pods have.<a name="line.280"></a>
+<span class="sourceLineNo">281</span>   *<a name="line.281"></a>
+<span class="sourceLineNo">282</span>   * &lt;p&gt;Tiller Pods are normally labeled with {@code app = helm} and<a name="line.282"></a>
+<span class="sourceLineNo">283</span>   * {@code name = tiller}.&lt;/p&gt;<a name="line.283"></a>
 <span class="sourceLineNo">284</span>   *<a name="line.284"></a>
-<span class="sourceLineNo">285</span>   * &lt;p&gt;Overrides of this method must not return {@code null}.&lt;/p&gt;<a name="line.285"></a>
-<span class="sourceLineNo">286</span>   *<a name="line.286"></a>
-<span class="sourceLineNo">287</span>   * &lt;p&gt;This implementation passes the supplied {@link<a name="line.287"></a>
-<span class="sourceLineNo">288</span>   * Tiller} to the {@linkplain ReleaseManager#ReleaseManager(Tiller)<a name="line.288"></a>
-<span class="sourceLineNo">289</span>   * appropriate &lt;code&gt;ReleaseManager&lt;/code&gt; constructor}.&lt;/p&gt;<a name="line.289"></a>
-<span class="sourceLineNo">290</span>   *<a name="line.290"></a>
-<span class="sourceLineNo">291</span>   * @param tiller the {@link Tiller} to use to communicate with a<a name="line.291"></a>
-<span class="sourceLineNo">292</span>   * Tiller server; must not be {@code null}<a name="line.292"></a>
-<span class="sourceLineNo">293</span>   *<a name="line.293"></a>
-<span class="sourceLineNo">294</span>   * @return a new {@link ReleaseManager}; never {@code null}<a name="line.294"></a>
-<span class="sourceLineNo">295</span>   *<a name="line.295"></a>
-<span class="sourceLineNo">296</span>   * @exception NullPointerException if {@code tiller} is {@code null}<a name="line.296"></a>
-<span class="sourceLineNo">297</span>   *<a name="line.297"></a>
-<span class="sourceLineNo">298</span>   * @exception IOException if there was a problem creating a {@link<a name="line.298"></a>
-<span class="sourceLineNo">299</span>   * ReleaseManager}<a name="line.299"></a>
-<span class="sourceLineNo">300</span>   */<a name="line.300"></a>
-<span class="sourceLineNo">301</span>  protected ReleaseManager createReleaseManager(final Tiller tiller) throws IOException {<a name="line.301"></a>
-<span class="sourceLineNo">302</span>    Objects.requireNonNull(tiller);<a name="line.302"></a>
-<span class="sourceLineNo">303</span>    return new ReleaseManager(tiller);<a name="line.303"></a>
-<span class="sourceLineNo">304</span>  }<a name="line.304"></a>
-<span class="sourceLineNo">305</span><a name="line.305"></a>
-<span class="sourceLineNo">306</span>  /**<a name="line.306"></a>
-<span class="sourceLineNo">307</span>   * Validates a &lt;a<a name="line.307"></a>
-<span class="sourceLineNo">308</span>   * href="https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/"&gt;Kubernetes<a name="line.308"></a>
-<span class="sourceLineNo">309</span>   * namespace&lt;/a&gt; for correctness.<a name="line.309"></a>
-<span class="sourceLineNo">310</span>   *<a name="line.310"></a>
-<span class="sourceLineNo">311</span>   * &lt;p&gt;The default implementation checks the supplied {@code<a name="line.311"></a>
-<span class="sourceLineNo">312</span>   * namespace} to see if it is less than or equal to {@value<a name="line.312"></a>
-<span class="sourceLineNo">313</span>   * ReleaseManager#DNS_LABEL_MAX_LENGTH} characters, and if it<a name="line.313"></a>
-<span class="sourceLineNo">314</span>   * {@linkplain Matcher#matches() matches} the value of the {@link<a name="line.314"></a>
-<span class="sourceLineNo">315</span>   * ReleaseManager#DNS_LABEL_PATTERN} field.&lt;/p&gt;<a name="line.315"></a>
-<span class="sourceLineNo">316</span>   *<a name="line.316"></a>
-<span class="sourceLineNo">317</span>   * @param namespace the &lt;a<a name="line.317"></a>
-<span class="sourceLineNo">318</span>   * href="https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/"&gt;namespace&lt;/a&gt;<a name="line.318"></a>
-<span class="sourceLineNo">319</span>   * to validate; may be {@code null}<a name="line.319"></a>
-<span class="sourceLineNo">320</span>   *<a name="line.320"></a>
-<span class="sourceLineNo">321</span>   * @exception IllegalArgumentException if {@code namespace} is<a name="line.321"></a>
-<span class="sourceLineNo">322</span>   * invalid<a name="line.322"></a>
-<span class="sourceLineNo">323</span>   */<a name="line.323"></a>
-<span class="sourceLineNo">324</span>  protected void validateNamespace(final String namespace) {<a name="line.324"></a>
-<span class="sourceLineNo">325</span>    if (namespace != null) {<a name="line.325"></a>
-<span class="sourceLineNo">326</span>      final int namespaceLength = namespace.length();<a name="line.326"></a>
-<span class="sourceLineNo">327</span>      if (namespaceLength &gt; ReleaseManager.DNS_LABEL_MAX_LENGTH) {<a name="line.327"></a>
-<span class="sourceLineNo">328</span>        throw new IllegalArgumentException("Invalid namespace: " + namespace + "; length is greater than " + ReleaseManager.DNS_LABEL_MAX_LENGTH + " characters: " + namespaceLength);<a name="line.328"></a>
-<span class="sourceLineNo">329</span>      } else if (namespaceLength &gt; 0) {<a name="line.329"></a>
-<span class="sourceLineNo">330</span>        final Matcher matcher = ReleaseManager.DNS_LABEL_PATTERN.matcher(namespace);<a name="line.330"></a>
-<span class="sourceLineNo">331</span>        assert matcher != null;<a name="line.331"></a>
-<span class="sourceLineNo">332</span>        if (!matcher.matches()) {<a name="line.332"></a>
-<span class="sourceLineNo">333</span>          throw new IllegalArgumentException("Invalid namespace: " + namespace + "; must match " + ReleaseManager.DNS_LABEL_PATTERN.toString());<a name="line.333"></a>
-<span class="sourceLineNo">334</span>        }<a name="line.334"></a>
-<span class="sourceLineNo">335</span>      }<a name="line.335"></a>
-<span class="sourceLineNo">336</span>    }<a name="line.336"></a>
-<span class="sourceLineNo">337</span>  }<a name="line.337"></a>
-<span class="sourceLineNo">338</span>  <a name="line.338"></a>
-<span class="sourceLineNo">339</span><a name="line.339"></a>
-<span class="sourceLineNo">340</span>  /*<a name="line.340"></a>
-<span class="sourceLineNo">341</span>   * Inner and nested classes.<a name="line.341"></a>
-<span class="sourceLineNo">342</span>   */<a name="line.342"></a>
-<span class="sourceLineNo">343</span><a name="line.343"></a>
-<span class="sourceLineNo">344</span><a name="line.344"></a>
-<span class="sourceLineNo">345</span>  /**<a name="line.345"></a>
-<span class="sourceLineNo">346</span>   * A {@link Callable} whose {@link #call()} method yields the same<a name="line.346"></a>
-<span class="sourceLineNo">347</span>   * {@link ReleaseManager} for every invocation, {@linkplain<a name="line.347"></a>
-<span class="sourceLineNo">348</span>   * AbstractReleaseMojo#createReleaseManager(Tiller) creating one} if<a name="line.348"></a>
-<span class="sourceLineNo">349</span>   * necessary.<a name="line.349"></a>
-<span class="sourceLineNo">350</span>   *<a name="line.350"></a>
-<span class="sourceLineNo">351</span>   * @author &lt;a href="https://about.me/lairdnelson"<a name="line.351"></a>
-<span class="sourceLineNo">352</span>   * target="_parent"&gt;Laird Nelson&lt;/a&gt;<a name="line.352"></a>
-<span class="sourceLineNo">353</span>   *<a name="line.353"></a>
-<span class="sourceLineNo">354</span>   * @see AbstractReleaseMojo#createReleaseManager(Tiller)<a name="line.354"></a>
+<span class="sourceLineNo">285</span>   * @param tillerLabels a {@link Map} containing the labels; may be<a name="line.285"></a>
+<span class="sourceLineNo">286</span>   * {@code null}<a name="line.286"></a>
+<span class="sourceLineNo">287</span>   */<a name="line.287"></a>
+<span class="sourceLineNo">288</span>  public void setTillerLabels(final Map&lt;String, String&gt; tillerLabels) {<a name="line.288"></a>
+<span class="sourceLineNo">289</span>    this.tillerLabels = tillerLabels;<a name="line.289"></a>
+<span class="sourceLineNo">290</span>  }<a name="line.290"></a>
+<span class="sourceLineNo">291</span><a name="line.291"></a>
+<span class="sourceLineNo">292</span><a name="line.292"></a>
+<span class="sourceLineNo">293</span>  /*<a name="line.293"></a>
+<span class="sourceLineNo">294</span>   * Protected instance methods.<a name="line.294"></a>
+<span class="sourceLineNo">295</span>   */<a name="line.295"></a>
+<span class="sourceLineNo">296</span>  <a name="line.296"></a>
+<span class="sourceLineNo">297</span><a name="line.297"></a>
+<span class="sourceLineNo">298</span>  /**<a name="line.298"></a>
+<span class="sourceLineNo">299</span>   * Performs a release-oriented task using a {@link ReleaseManager}<a name="line.299"></a>
+<span class="sourceLineNo">300</span>   * {@linkplain Callable#call() available} from the supplied {@link<a name="line.300"></a>
+<span class="sourceLineNo">301</span>   * Callable}.<a name="line.301"></a>
+<span class="sourceLineNo">302</span>   *<a name="line.302"></a>
+<span class="sourceLineNo">303</span>   * @param releaseManagerCallable the {@link Callable} that will<a name="line.303"></a>
+<span class="sourceLineNo">304</span>   * provide a {@link ReleaseManager}; must not be {@code null}<a name="line.304"></a>
+<span class="sourceLineNo">305</span>   *<a name="line.305"></a>
+<span class="sourceLineNo">306</span>   * @exception Exception if an error occurs<a name="line.306"></a>
+<span class="sourceLineNo">307</span>   */<a name="line.307"></a>
+<span class="sourceLineNo">308</span>  protected abstract void execute(final Callable&lt;ReleaseManager&gt; releaseManagerCallable) throws Exception;<a name="line.308"></a>
+<span class="sourceLineNo">309</span><a name="line.309"></a>
+<span class="sourceLineNo">310</span>  /**<a name="line.310"></a>
+<span class="sourceLineNo">311</span>   * Creates a {@link DefaultKubernetesClient} for communicating with<a name="line.311"></a>
+<span class="sourceLineNo">312</span>   * Kubernetes clusters.<a name="line.312"></a>
+<span class="sourceLineNo">313</span>   *<a name="line.313"></a>
+<span class="sourceLineNo">314</span>   * &lt;p&gt;This method never returns {@code null}.&lt;/p&gt;<a name="line.314"></a>
+<span class="sourceLineNo">315</span>   *<a name="line.315"></a>
+<span class="sourceLineNo">316</span>   * &lt;p&gt;Overrides of this method must not return {@code null}.&lt;/p&gt;<a name="line.316"></a>
+<span class="sourceLineNo">317</span>   *<a name="line.317"></a>
+<span class="sourceLineNo">318</span>   * &lt;p&gt;The default implementation calls the {@link<a name="line.318"></a>
+<span class="sourceLineNo">319</span>   * #getClientConfiguration()} method and {@linkplain<a name="line.319"></a>
+<span class="sourceLineNo">320</span>   * DefaultKubernetesClient#DefaultKubernetesClient(Config) uses its<a name="line.320"></a>
+<span class="sourceLineNo">321</span>   * return value}, unless it is {@code null}, in which case a new<a name="line.321"></a>
+<span class="sourceLineNo">322</span>   * {@link DefaultKubernetesClient} is created via its {@linkplain<a name="line.322"></a>
+<span class="sourceLineNo">323</span>   * DefaultKubernetesClient#DefaultKubernetesClient() no-argument<a name="line.323"></a>
+<span class="sourceLineNo">324</span>   * constructor}.&lt;/p&gt;<a name="line.324"></a>
+<span class="sourceLineNo">325</span>   *<a name="line.325"></a>
+<span class="sourceLineNo">326</span>   * @return a new, non-{@code null} {@link DefaultKubernetesClient}<a name="line.326"></a>
+<span class="sourceLineNo">327</span>   *<a name="line.327"></a>
+<span class="sourceLineNo">328</span>   * @exception IOException if there was a problem creating the client<a name="line.328"></a>
+<span class="sourceLineNo">329</span>   */<a name="line.329"></a>
+<span class="sourceLineNo">330</span>  protected DefaultKubernetesClient createClient() throws IOException {<a name="line.330"></a>
+<span class="sourceLineNo">331</span>    final DefaultKubernetesClient client;<a name="line.331"></a>
+<span class="sourceLineNo">332</span>    final Config config = this.getClientConfiguration();<a name="line.332"></a>
+<span class="sourceLineNo">333</span>    if (config == null) {<a name="line.333"></a>
+<span class="sourceLineNo">334</span>      client = new DefaultKubernetesClient();<a name="line.334"></a>
+<span class="sourceLineNo">335</span>    } else {<a name="line.335"></a>
+<span class="sourceLineNo">336</span>      client = new DefaultKubernetesClient(config);<a name="line.336"></a>
+<span class="sourceLineNo">337</span>    }<a name="line.337"></a>
+<span class="sourceLineNo">338</span>    return client;<a name="line.338"></a>
+<span class="sourceLineNo">339</span>  }<a name="line.339"></a>
+<span class="sourceLineNo">340</span><a name="line.340"></a>
+<span class="sourceLineNo">341</span>  /**<a name="line.341"></a>
+<span class="sourceLineNo">342</span>   * Creates a {@link Tiller} and returns it.<a name="line.342"></a>
+<span class="sourceLineNo">343</span>   *<a name="line.343"></a>
+<span class="sourceLineNo">344</span>   * &lt;p&gt;This method never returns {@code null}.&lt;/p&gt;<a name="line.344"></a>
+<span class="sourceLineNo">345</span>   *<a name="line.345"></a>
+<span class="sourceLineNo">346</span>   * &lt;p&gt;Overrides of this method must not return {@code null}.&lt;/p&gt;<a name="line.346"></a>
+<span class="sourceLineNo">347</span>   *<a name="line.347"></a>
+<span class="sourceLineNo">348</span>   * &lt;p&gt;This implementation passes the supplied {@link<a name="line.348"></a>
+<span class="sourceLineNo">349</span>   * DefaultKubernetesClient} to the &lt;a<a name="line.349"></a>
+<span class="sourceLineNo">350</span>   * href="https://microbean.github.io/microbean-helm/apidocs/org/microbean/helm/Tiller.html#Tiller-T-"&gt;appropriate<a name="line.350"></a>
+<span class="sourceLineNo">351</span>   * &lt;code&gt;Tiller&lt;/code&gt; constructor&lt;/a&gt;.&lt;/p&gt;<a name="line.351"></a>
+<span class="sourceLineNo">352</span>   *<a name="line.352"></a>
+<span class="sourceLineNo">353</span>   * @param client the {@link DefaultKubernetesClient} to use to<a name="line.353"></a>
+<span class="sourceLineNo">354</span>   * communicate with a Kubernetes cluster; must not be {@code null}<a name="line.354"></a>
 <span class="sourceLineNo">355</span>   *<a name="line.355"></a>
-<span class="sourceLineNo">356</span>   * @see AbstractReleaseMojo#createTiller(DefaultKubernetesClient)<a name="line.356"></a>
+<span class="sourceLineNo">356</span>   * @return a new {@link Tiller}; never {@code null}<a name="line.356"></a>
 <span class="sourceLineNo">357</span>   *<a name="line.357"></a>
-<span class="sourceLineNo">358</span>   * @see AbstractReleaseMojo#createClient()<a name="line.358"></a>
-<span class="sourceLineNo">359</span>   */<a name="line.359"></a>
-<span class="sourceLineNo">360</span>  private final class ReleaseManagerCallable implements Callable&lt;ReleaseManager&gt; {<a name="line.360"></a>
-<span class="sourceLineNo">361</span><a name="line.361"></a>
-<span class="sourceLineNo">362</span><a name="line.362"></a>
-<span class="sourceLineNo">363</span>    /*<a name="line.363"></a>
-<span class="sourceLineNo">364</span>     * Instance fields.<a name="line.364"></a>
-<span class="sourceLineNo">365</span>     */<a name="line.365"></a>
-<span class="sourceLineNo">366</span><a name="line.366"></a>
+<span class="sourceLineNo">358</span>   * @exception NullPointerException if {@code client} is {@code null}<a name="line.358"></a>
+<span class="sourceLineNo">359</span>   *<a name="line.359"></a>
+<span class="sourceLineNo">360</span>   * @exception IOException if there was a problem creating a {@link<a name="line.360"></a>
+<span class="sourceLineNo">361</span>   * Tiller}<a name="line.361"></a>
+<span class="sourceLineNo">362</span>   */<a name="line.362"></a>
+<span class="sourceLineNo">363</span>  protected Tiller createTiller(final DefaultKubernetesClient client) throws IOException {<a name="line.363"></a>
+<span class="sourceLineNo">364</span>    Objects.requireNonNull(client);<a name="line.364"></a>
+<span class="sourceLineNo">365</span>    return new Tiller(client, this.getTillerNamespace(), this.getTillerPort(), this.getTillerLabels());<a name="line.365"></a>
+<span class="sourceLineNo">366</span>  }<a name="line.366"></a>
 <span class="sourceLineNo">367</span><a name="line.367"></a>
-<span class="sourceLineNo">368</span>    /**<a name="line.368"></a>
-<span class="sourceLineNo">369</span>     * The {@link ReleaseManager} to return from the {@link #call()}<a name="line.369"></a>
-<span class="sourceLineNo">370</span>     * method.<a name="line.370"></a>
-<span class="sourceLineNo">371</span>     *<a name="line.371"></a>
-<span class="sourceLineNo">372</span>     * &lt;p&gt;This field may be {@code null}.&lt;/p&gt;<a name="line.372"></a>
-<span class="sourceLineNo">373</span>     *<a name="line.373"></a>
-<span class="sourceLineNo">374</span>     * @sed #call()<a name="line.374"></a>
-<span class="sourceLineNo">375</span>     */<a name="line.375"></a>
-<span class="sourceLineNo">376</span>    private ReleaseManager releaseManager;<a name="line.376"></a>
-<span class="sourceLineNo">377</span><a name="line.377"></a>
-<span class="sourceLineNo">378</span><a name="line.378"></a>
-<span class="sourceLineNo">379</span>    /*<a name="line.379"></a>
-<span class="sourceLineNo">380</span>     * Constructors.<a name="line.380"></a>
-<span class="sourceLineNo">381</span>     */<a name="line.381"></a>
-<span class="sourceLineNo">382</span><a name="line.382"></a>
-<span class="sourceLineNo">383</span><a name="line.383"></a>
-<span class="sourceLineNo">384</span>    /**<a name="line.384"></a>
-<span class="sourceLineNo">385</span>     * Creates a new {@link ReleaseManagerCallable}.<a name="line.385"></a>
-<span class="sourceLineNo">386</span>     */<a name="line.386"></a>
-<span class="sourceLineNo">387</span>    private ReleaseManagerCallable() {<a name="line.387"></a>
-<span class="sourceLineNo">388</span>      super();<a name="line.388"></a>
-<span class="sourceLineNo">389</span>    }<a name="line.389"></a>
-<span class="sourceLineNo">390</span><a name="line.390"></a>
-<span class="sourceLineNo">391</span><a name="line.391"></a>
-<span class="sourceLineNo">392</span>    /*<a name="line.392"></a>
-<span class="sourceLineNo">393</span>     * Instance methods.<a name="line.393"></a>
-<span class="sourceLineNo">394</span>     */<a name="line.394"></a>
-<span class="sourceLineNo">395</span><a name="line.395"></a>
-<span class="sourceLineNo">396</span><a name="line.396"></a>
-<span class="sourceLineNo">397</span>    /**<a name="line.397"></a>
-<span class="sourceLineNo">398</span>     * Returns a {@link ReleaseManager}, {@linkplain<a name="line.398"></a>
-<span class="sourceLineNo">399</span>     * AbstractReleaseMojo#createReleaseManager(Tiller) creating one}<a name="line.399"></a>
-<span class="sourceLineNo">400</span>     * if necessary.<a name="line.400"></a>
-<span class="sourceLineNo">401</span>     *<a name="line.401"></a>
-<span class="sourceLineNo">402</span>     * &lt;p&gt;This method never returns {@code null}.&lt;/p&gt;<a name="line.402"></a>
-<span class="sourceLineNo">403</span>     *<a name="line.403"></a>
-<span class="sourceLineNo">404</span>     * @return a {@link ReleaseManager}; never {@code null}<a name="line.404"></a>
-<span class="sourceLineNo">405</span>     *<a name="line.405"></a>
-<span class="sourceLineNo">406</span>     * @exception IOException if there was a problem creating a {@link<a name="line.406"></a>
-<span class="sourceLineNo">407</span>     * ReleaseManager}<a name="line.407"></a>
-<span class="sourceLineNo">408</span>     */<a name="line.408"></a>
-<span class="sourceLineNo">409</span>    @Override<a name="line.409"></a>
-<span class="sourceLineNo">410</span>    public final ReleaseManager call() throws IOException {<a name="line.410"></a>
-<span class="sourceLineNo">411</span>      if (this.releaseManager == null) {<a name="line.411"></a>
-<span class="sourceLineNo">412</span>        this.releaseManager = createReleaseManager(createTiller(createClient()));<a name="line.412"></a>
-<span class="sourceLineNo">413</span>      }<a name="line.413"></a>
-<span class="sourceLineNo">414</span>      return this.releaseManager;<a name="line.414"></a>
-<span class="sourceLineNo">415</span>    }<a name="line.415"></a>
-<span class="sourceLineNo">416</span>    <a name="line.416"></a>
-<span class="sourceLineNo">417</span>  }<a name="line.417"></a>
-<span class="sourceLineNo">418</span>  <a name="line.418"></a>
-<span class="sourceLineNo">419</span>}<a name="line.419"></a>
+<span class="sourceLineNo">368</span>  /**<a name="line.368"></a>
+<span class="sourceLineNo">369</span>   * Creates a {@link ReleaseManager} and returns it.<a name="line.369"></a>
+<span class="sourceLineNo">370</span>   *<a name="line.370"></a>
+<span class="sourceLineNo">371</span>   * &lt;p&gt;This method never returns {@code null}.&lt;/p&gt;<a name="line.371"></a>
+<span class="sourceLineNo">372</span>   *<a name="line.372"></a>
+<span class="sourceLineNo">373</span>   * &lt;p&gt;Overrides of this method must not return {@code null}.&lt;/p&gt;<a name="line.373"></a>
+<span class="sourceLineNo">374</span>   *<a name="line.374"></a>
+<span class="sourceLineNo">375</span>   * &lt;p&gt;This implementation passes the supplied {@link<a name="line.375"></a>
+<span class="sourceLineNo">376</span>   * Tiller} to the {@linkplain ReleaseManager#ReleaseManager(Tiller)<a name="line.376"></a>
+<span class="sourceLineNo">377</span>   * appropriate &lt;code&gt;ReleaseManager&lt;/code&gt; constructor}.&lt;/p&gt;<a name="line.377"></a>
+<span class="sourceLineNo">378</span>   *<a name="line.378"></a>
+<span class="sourceLineNo">379</span>   * @param tiller the {@link Tiller} to use to communicate with a<a name="line.379"></a>
+<span class="sourceLineNo">380</span>   * Tiller server; must not be {@code null}<a name="line.380"></a>
+<span class="sourceLineNo">381</span>   *<a name="line.381"></a>
+<span class="sourceLineNo">382</span>   * @return a new {@link ReleaseManager}; never {@code null}<a name="line.382"></a>
+<span class="sourceLineNo">383</span>   *<a name="line.383"></a>
+<span class="sourceLineNo">384</span>   * @exception NullPointerException if {@code tiller} is {@code null}<a name="line.384"></a>
+<span class="sourceLineNo">385</span>   *<a name="line.385"></a>
+<span class="sourceLineNo">386</span>   * @exception IOException if there was a problem creating a {@link<a name="line.386"></a>
+<span class="sourceLineNo">387</span>   * ReleaseManager}<a name="line.387"></a>
+<span class="sourceLineNo">388</span>   */<a name="line.388"></a>
+<span class="sourceLineNo">389</span>  protected ReleaseManager createReleaseManager(final Tiller tiller) throws IOException {<a name="line.389"></a>
+<span class="sourceLineNo">390</span>    Objects.requireNonNull(tiller);<a name="line.390"></a>
+<span class="sourceLineNo">391</span>    return new ReleaseManager(tiller);<a name="line.391"></a>
+<span class="sourceLineNo">392</span>  }<a name="line.392"></a>
+<span class="sourceLineNo">393</span><a name="line.393"></a>
+<span class="sourceLineNo">394</span>  /**<a name="line.394"></a>
+<span class="sourceLineNo">395</span>   * Validates a &lt;a<a name="line.395"></a>
+<span class="sourceLineNo">396</span>   * href="https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/"&gt;Kubernetes<a name="line.396"></a>
+<span class="sourceLineNo">397</span>   * namespace&lt;/a&gt; for correctness.<a name="line.397"></a>
+<span class="sourceLineNo">398</span>   *<a name="line.398"></a>
+<span class="sourceLineNo">399</span>   * &lt;p&gt;The default implementation checks the supplied {@code<a name="line.399"></a>
+<span class="sourceLineNo">400</span>   * namespace} to see if it is less than or equal to {@value<a name="line.400"></a>
+<span class="sourceLineNo">401</span>   * ReleaseManager#DNS_LABEL_MAX_LENGTH} characters, and if it<a name="line.401"></a>
+<span class="sourceLineNo">402</span>   * {@linkplain Matcher#matches() matches} the value of the {@link<a name="line.402"></a>
+<span class="sourceLineNo">403</span>   * ReleaseManager#DNS_LABEL_PATTERN} field.&lt;/p&gt;<a name="line.403"></a>
+<span class="sourceLineNo">404</span>   *<a name="line.404"></a>
+<span class="sourceLineNo">405</span>   * @param namespace the &lt;a<a name="line.405"></a>
+<span class="sourceLineNo">406</span>   * href="https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/"&gt;namespace&lt;/a&gt;<a name="line.406"></a>
+<span class="sourceLineNo">407</span>   * to validate; may be {@code null}<a name="line.407"></a>
+<span class="sourceLineNo">408</span>   *<a name="line.408"></a>
+<span class="sourceLineNo">409</span>   * @exception IllegalArgumentException if {@code namespace} is<a name="line.409"></a>
+<span class="sourceLineNo">410</span>   * invalid<a name="line.410"></a>
+<span class="sourceLineNo">411</span>   */<a name="line.411"></a>
+<span class="sourceLineNo">412</span>  protected void validateNamespace(final String namespace) {<a name="line.412"></a>
+<span class="sourceLineNo">413</span>    if (namespace != null) {<a name="line.413"></a>
+<span class="sourceLineNo">414</span>      final int namespaceLength = namespace.length();<a name="line.414"></a>
+<span class="sourceLineNo">415</span>      if (namespaceLength &gt; ReleaseManager.DNS_LABEL_MAX_LENGTH) {<a name="line.415"></a>
+<span class="sourceLineNo">416</span>        throw new IllegalArgumentException("Invalid namespace: " + namespace + "; length is greater than " + ReleaseManager.DNS_LABEL_MAX_LENGTH + " characters: " + namespaceLength);<a name="line.416"></a>
+<span class="sourceLineNo">417</span>      } else if (namespaceLength &gt; 0) {<a name="line.417"></a>
+<span class="sourceLineNo">418</span>        final Matcher matcher = ReleaseManager.DNS_LABEL_PATTERN.matcher(namespace);<a name="line.418"></a>
+<span class="sourceLineNo">419</span>        assert matcher != null;<a name="line.419"></a>
+<span class="sourceLineNo">420</span>        if (!matcher.matches()) {<a name="line.420"></a>
+<span class="sourceLineNo">421</span>          throw new IllegalArgumentException("Invalid namespace: " + namespace + "; must match " + ReleaseManager.DNS_LABEL_PATTERN.toString());<a name="line.421"></a>
+<span class="sourceLineNo">422</span>        }<a name="line.422"></a>
+<span class="sourceLineNo">423</span>      }<a name="line.423"></a>
+<span class="sourceLineNo">424</span>    }<a name="line.424"></a>
+<span class="sourceLineNo">425</span>  }<a name="line.425"></a>
+<span class="sourceLineNo">426</span>  <a name="line.426"></a>
+<span class="sourceLineNo">427</span><a name="line.427"></a>
+<span class="sourceLineNo">428</span>  /*<a name="line.428"></a>
+<span class="sourceLineNo">429</span>   * Inner and nested classes.<a name="line.429"></a>
+<span class="sourceLineNo">430</span>   */<a name="line.430"></a>
+<span class="sourceLineNo">431</span><a name="line.431"></a>
+<span class="sourceLineNo">432</span><a name="line.432"></a>
+<span class="sourceLineNo">433</span>  /**<a name="line.433"></a>
+<span class="sourceLineNo">434</span>   * A {@link Callable} whose {@link #call()} method yields the same<a name="line.434"></a>
+<span class="sourceLineNo">435</span>   * {@link ReleaseManager} for every invocation, {@linkplain<a name="line.435"></a>
+<span class="sourceLineNo">436</span>   * AbstractReleaseMojo#createReleaseManager(Tiller) creating one} if<a name="line.436"></a>
+<span class="sourceLineNo">437</span>   * necessary.<a name="line.437"></a>
+<span class="sourceLineNo">438</span>   *<a name="line.438"></a>
+<span class="sourceLineNo">439</span>   * @author &lt;a href="https://about.me/lairdnelson"<a name="line.439"></a>
+<span class="sourceLineNo">440</span>   * target="_parent"&gt;Laird Nelson&lt;/a&gt;<a name="line.440"></a>
+<span class="sourceLineNo">441</span>   *<a name="line.441"></a>
+<span class="sourceLineNo">442</span>   * @see AbstractReleaseMojo#createReleaseManager(Tiller)<a name="line.442"></a>
+<span class="sourceLineNo">443</span>   *<a name="line.443"></a>
+<span class="sourceLineNo">444</span>   * @see AbstractReleaseMojo#createTiller(DefaultKubernetesClient)<a name="line.444"></a>
+<span class="sourceLineNo">445</span>   *<a name="line.445"></a>
+<span class="sourceLineNo">446</span>   * @see AbstractReleaseMojo#createClient()<a name="line.446"></a>
+<span class="sourceLineNo">447</span>   */<a name="line.447"></a>
+<span class="sourceLineNo">448</span>  private final class ReleaseManagerCallable implements Callable&lt;ReleaseManager&gt; {<a name="line.448"></a>
+<span class="sourceLineNo">449</span><a name="line.449"></a>
+<span class="sourceLineNo">450</span><a name="line.450"></a>
+<span class="sourceLineNo">451</span>    /*<a name="line.451"></a>
+<span class="sourceLineNo">452</span>     * Instance fields.<a name="line.452"></a>
+<span class="sourceLineNo">453</span>     */<a name="line.453"></a>
+<span class="sourceLineNo">454</span><a name="line.454"></a>
+<span class="sourceLineNo">455</span><a name="line.455"></a>
+<span class="sourceLineNo">456</span>    /**<a name="line.456"></a>
+<span class="sourceLineNo">457</span>     * The {@link ReleaseManager} to return from the {@link #call()}<a name="line.457"></a>
+<span class="sourceLineNo">458</span>     * method.<a name="line.458"></a>
+<span class="sourceLineNo">459</span>     *<a name="line.459"></a>
+<span class="sourceLineNo">460</span>     * &lt;p&gt;This field may be {@code null}.&lt;/p&gt;<a name="line.460"></a>
+<span class="sourceLineNo">461</span>     *<a name="line.461"></a>
+<span class="sourceLineNo">462</span>     * @sed #call()<a name="line.462"></a>
+<span class="sourceLineNo">463</span>     */<a name="line.463"></a>
+<span class="sourceLineNo">464</span>    private ReleaseManager releaseManager;<a name="line.464"></a>
+<span class="sourceLineNo">465</span><a name="line.465"></a>
+<span class="sourceLineNo">466</span><a name="line.466"></a>
+<span class="sourceLineNo">467</span>    /*<a name="line.467"></a>
+<span class="sourceLineNo">468</span>     * Constructors.<a name="line.468"></a>
+<span class="sourceLineNo">469</span>     */<a name="line.469"></a>
+<span class="sourceLineNo">470</span><a name="line.470"></a>
+<span class="sourceLineNo">471</span><a name="line.471"></a>
+<span class="sourceLineNo">472</span>    /**<a name="line.472"></a>
+<span class="sourceLineNo">473</span>     * Creates a new {@link ReleaseManagerCallable}.<a name="line.473"></a>
+<span class="sourceLineNo">474</span>     */<a name="line.474"></a>
+<span class="sourceLineNo">475</span>    private ReleaseManagerCallable() {<a name="line.475"></a>
+<span class="sourceLineNo">476</span>      super();<a name="line.476"></a>
+<span class="sourceLineNo">477</span>    }<a name="line.477"></a>
+<span class="sourceLineNo">478</span><a name="line.478"></a>
+<span class="sourceLineNo">479</span><a name="line.479"></a>
+<span class="sourceLineNo">480</span>    /*<a name="line.480"></a>
+<span class="sourceLineNo">481</span>     * Instance methods.<a name="line.481"></a>
+<span class="sourceLineNo">482</span>     */<a name="line.482"></a>
+<span class="sourceLineNo">483</span><a name="line.483"></a>
+<span class="sourceLineNo">484</span><a name="line.484"></a>
+<span class="sourceLineNo">485</span>    /**<a name="line.485"></a>
+<span class="sourceLineNo">486</span>     * Returns a {@link ReleaseManager}, {@linkplain<a name="line.486"></a>
+<span class="sourceLineNo">487</span>     * AbstractReleaseMojo#createReleaseManager(Tiller) creating one}<a name="line.487"></a>
+<span class="sourceLineNo">488</span>     * if necessary.<a name="line.488"></a>
+<span class="sourceLineNo">489</span>     *<a name="line.489"></a>
+<span class="sourceLineNo">490</span>     * &lt;p&gt;This method never returns {@code null}.&lt;/p&gt;<a name="line.490"></a>
+<span class="sourceLineNo">491</span>     *<a name="line.491"></a>
+<span class="sourceLineNo">492</span>     * @return a {@link ReleaseManager}; never {@code null}<a name="line.492"></a>
+<span class="sourceLineNo">493</span>     *<a name="line.493"></a>
+<span class="sourceLineNo">494</span>     * @exception IOException if there was a problem creating a {@link<a name="line.494"></a>
+<span class="sourceLineNo">495</span>     * ReleaseManager}<a name="line.495"></a>
+<span class="sourceLineNo">496</span>     */<a name="line.496"></a>
+<span class="sourceLineNo">497</span>    @Override<a name="line.497"></a>
+<span class="sourceLineNo">498</span>    public final ReleaseManager call() throws IOException {<a name="line.498"></a>
+<span class="sourceLineNo">499</span>      if (this.releaseManager == null) {<a name="line.499"></a>
+<span class="sourceLineNo">500</span>        this.releaseManager = createReleaseManager(createTiller(createClient()));<a name="line.500"></a>
+<span class="sourceLineNo">501</span>      }<a name="line.501"></a>
+<span class="sourceLineNo">502</span>      return this.releaseManager;<a name="line.502"></a>
+<span class="sourceLineNo">503</span>    }<a name="line.503"></a>
+<span class="sourceLineNo">504</span>    <a name="line.504"></a>
+<span class="sourceLineNo">505</span>  }<a name="line.505"></a>
+<span class="sourceLineNo">506</span>  <a name="line.506"></a>
+<span class="sourceLineNo">507</span>}<a name="line.507"></a>
 
 
 
