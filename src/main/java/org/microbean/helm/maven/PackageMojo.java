@@ -23,6 +23,7 @@ import java.io.OutputStream;
 
 import java.net.UnknownServiceException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 
@@ -91,10 +92,11 @@ public class PackageMojo extends AbstractHelmMojo implements Disposable {
   private boolean skip;
 
   /**
-   * A {@link URI} pointing to the Helm chart contents to load.
+   * A {@link String} in {@link URI} form pointing to the Helm chart
+   * contents to load.
    */
   @Parameter(required = true, defaultValue = "file:${project.basedir}/src/helm/charts/${project.artifactId}/")
-  private URI chartContentsUri;
+  private String chartContentsUri;
   
   @Parameter
   private AbstractChartLoader<URL> chartLoader;
@@ -369,11 +371,32 @@ public class PackageMojo extends AbstractHelmMojo implements Disposable {
   }
 
   public URI getChartContentsUri() {
-    return this.chartContentsUri;
+    final URI returnValue;
+    if (this.chartContentsUri == null) {
+      returnValue = null;
+    } else {
+      URI temp = null;
+      try {
+        temp = new URI(this.chartContentsUri);
+      } catch (final URISyntaxException uriSyntaxException) {
+        try {
+          temp = new URI(this.chartContentsUri.replace('\\', '/'));
+        } catch (final URISyntaxException backslashReplacementFailed) {
+          throw new IllegalStateException(backslashReplacementFailed.getMessage(), backslashReplacementFailed);
+        }
+      } finally {
+        returnValue = temp;
+      }
+    }
+    return returnValue;
   }
 
   public void setChartContentsUri(final URI chartContentsUri) {
-    this.chartContentsUri = chartContentsUri;
+    if (chartContentsUri == null) {
+      this.chartContentsUri = null;
+    } else {
+      this.chartContentsUri = chartContentsUri.toString();
+    }
   }
 
   public URI getChartTargetUri() {
